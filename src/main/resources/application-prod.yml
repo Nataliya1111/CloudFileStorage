@@ -1,0 +1,3 @@
+spring:
+  profiles:
+    active: prod  #don't need cause have it in docker-compose.yml for prod
