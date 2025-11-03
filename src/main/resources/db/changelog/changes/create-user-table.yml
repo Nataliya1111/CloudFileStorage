@@ -13,15 +13,24 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
               - column:
-                  name: login
-                  type: VARCHAR(30)
+                  name: username
+                  type: VARCHAR(20)
                   constraints:
                     unique: true
                     nullable: false
               - column:
                   name: password
-                  type: VARCHAR(30)
+                  type: VARCHAR(255)
                   constraints:
                     nullable: false
-
-
+              - column:
+                  name: role
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+        - createIndex:
+            indexName: idx_users_username
+            tableName: users
+            columns:
+              - column:
+                  name: username
