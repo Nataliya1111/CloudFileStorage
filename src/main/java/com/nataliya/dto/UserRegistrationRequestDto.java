@@ -12,7 +12,7 @@ public record UserRegistrationRequestDto(
         )
         @Pattern(
                 regexp = "^[a-zA-Z0-9]+[a-zA-Z_0-9]*[a-zA-Z0-9]+$",
-                message = "Login can contain only letters, digits or underscores ('_' - not the first or the last character)"
+                message = "Username can contain only letters, digits or underscores (not the first or the last character)"
         )
         String username,
 
