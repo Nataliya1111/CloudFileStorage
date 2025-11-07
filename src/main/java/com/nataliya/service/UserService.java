@@ -1,7 +1,7 @@
 package com.nataliya.service;
 
 import com.nataliya.dto.UserRegistrationRequestDto;
-import com.nataliya.dto.UserRegistrationResponseDto;
+import com.nataliya.dto.UsernameResponseDto;
 import com.nataliya.exception.UserAlreadyExistsException;
 import com.nataliya.model.Role;
 import com.nataliya.model.User;
@@ -19,7 +19,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserRegistrationResponseDto register(UserRegistrationRequestDto userRequestDto) {
+    public UsernameResponseDto register(UserRegistrationRequestDto userRequestDto) {
 
         User user = User.builder()
                 .username(userRequestDto.username())
@@ -29,7 +29,7 @@ public class UserService {
 
         try {
             User savedUser = userRepository.save(user);
-            return new UserRegistrationResponseDto(savedUser.getUsername());
+            return new UsernameResponseDto(savedUser.getUsername());
         } catch (DataIntegrityViolationException ex) {
             if (ex.getCause() instanceof ConstraintViolationException) {
                 throw new UserAlreadyExistsException("User with such login already exists", ex);

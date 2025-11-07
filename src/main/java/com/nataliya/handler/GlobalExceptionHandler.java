@@ -2,6 +2,7 @@ package com.nataliya.handler;
 
 import com.nataliya.dto.ErrorResponseDto;
 import com.nataliya.exception.UserAlreadyExistsException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -44,4 +45,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ErrorResponseDto(message));
     }
+
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponseDto> handleException(Exception ex, HttpServletRequest request){
+
+        log.error("Unhandled exception at [{} {}]: {}",
+                request.getMethod(),
+                request.getRequestURI(),
+                ex.getMessage(),
+                ex);
+
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponseDto("Unexpected server error. Please try again later."));
+    }
+
+
+
 }
