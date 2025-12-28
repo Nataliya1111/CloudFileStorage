@@ -1,10 +1,7 @@
 package com.nataliya.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nataliya.security.HttpStatusLogoutSuccessHandler;
-import com.nataliya.security.JsonAuthenticationFailureHandler;
-import com.nataliya.security.JsonAuthenticationSuccessHandler;
-import com.nataliya.security.JsonUsernamePasswordAuthenticationFilter;
+import com.nataliya.security.*;
 import com.nataliya.util.UserDtoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +29,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(
             HttpSecurity http,
             JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter,
+            JsonAuthenticationEntryPoint jsonAuthenticationEntryPoint,
             HttpStatusLogoutSuccessHandler logoutSuccessHandler
     ) throws Exception {
         http
@@ -42,6 +40,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/sign-up", "/api/auth/sign-in").permitAll()
                         .anyRequest().authenticated()
                 )
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(jsonAuthenticationEntryPoint))
                 .addFilterAt(jsonUsernamePasswordAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/sign-out")
