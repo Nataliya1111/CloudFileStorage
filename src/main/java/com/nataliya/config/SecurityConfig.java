@@ -1,6 +1,11 @@
 package com.nataliya.config;
 
-import com.nataliya.security.CustomUserDetailsService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nataliya.security.HttpStatusLogoutSuccessHandler;
+import com.nataliya.security.JsonAuthenticationFailureHandler;
+import com.nataliya.security.JsonAuthenticationSuccessHandler;
+import com.nataliya.security.JsonUsernamePasswordAuthenticationFilter;
+import com.nataliya.util.UserDtoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +19,7 @@ import org.springframework.security.config.annotation.web.configurers.HttpBasicC
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 
@@ -22,10 +28,12 @@ import org.springframework.security.web.context.SecurityContextRepository;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomUserDetailsService customUserDetailsService;
-
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter,
+            HttpStatusLogoutSuccessHandler logoutSuccessHandler
+    ) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(FormLoginConfigurer::disable)
@@ -33,7 +41,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/sign-up", "/api/auth/sign-in").permitAll()
                         .anyRequest().authenticated()
-                );
+                )
+                .addFilterAt(jsonUsernamePasswordAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .logout(logout -> logout
+                        .logoutUrl("/api/auth/sign-out")
+                        .logoutSuccessHandler(logoutSuccessHandler))
+        ;
 
         return http.build();
     }
@@ -48,9 +61,29 @@ public class SecurityConfig {
         return new HttpSessionSecurityContextRepository();
     }
 
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    @Bean
+    public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter(
+            AuthenticationManager authenticationManager,
+            UserDtoValidator validator,
+            ObjectMapper objectMapper,
+            JsonAuthenticationSuccessHandler successHandler,
+            JsonAuthenticationFailureHandler failureHandler,
+            SecurityContextRepository securityContextRepository
+    ) {
+        return new JsonUsernamePasswordAuthenticationFilter
+                (
+                        authenticationManager,
+                        validator,
+                        objectMapper,
+                        successHandler,
+                        failureHandler,
+                        securityContextRepository
+                );
+    }
+
 }
