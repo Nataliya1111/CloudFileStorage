@@ -2,7 +2,7 @@ package com.nataliya.controller;
 
 import com.nataliya.dto.UserRegistrationRequestDto;
 import com.nataliya.dto.UsernameResponseDto;
-import com.nataliya.service.UserService;
+import com.nataliya.service.RegistrationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,14 +16,14 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final UserService userService;
+    private final RegistrationService registrationService;
 
     @PostMapping("/sign-up")
     public ResponseEntity<UsernameResponseDto> register(
             @Valid @RequestBody UserRegistrationRequestDto userRequestDto
     ) {
 
-        UsernameResponseDto userResponseDto = userService.register(userRequestDto);
+        UsernameResponseDto userResponseDto = registrationService.registerUser(userRequestDto);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

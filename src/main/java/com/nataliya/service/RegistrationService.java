@@ -14,12 +14,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class RegistrationService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UsernameResponseDto register(UserRegistrationRequestDto userRequestDto) {
+    public UsernameResponseDto registerUser(UserRegistrationRequestDto userRequestDto) {
 
         User user = User.builder()
                 .username(userRequestDto.username())
