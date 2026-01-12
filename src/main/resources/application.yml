@@ -1,14 +1,24 @@
 spring:
   profiles:
     active: dev
+
   datasource:
     url: jdbc:postgresql://localhost:5433/testdatabase
     username: testuser
     password: testpassword
     driver-class-name: org.postgresql.Driver
+
   jpa:
     properties.hibernate:
       show_sql: true
       format_sql: true
+
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yml
+
+  session:
+    timeout: 60m
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
