@@ -1,4 +1,4 @@
-package com.nataliya.security;
+package com.nataliya.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nataliya.dto.UserAuthenticationRequestDto;

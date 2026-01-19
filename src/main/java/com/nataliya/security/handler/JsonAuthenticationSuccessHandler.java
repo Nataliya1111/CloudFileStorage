@@ -1,4 +1,4 @@
-package com.nataliya.security;
+package com.nataliya.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nataliya.dto.UsernameResponseDto;

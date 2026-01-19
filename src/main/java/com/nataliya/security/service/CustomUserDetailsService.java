@@ -1,4 +1,4 @@
-package com.nataliya.security;
+package com.nataliya.security.service;
 
 import com.nataliya.model.User;
 import lombok.RequiredArgsConstructor;

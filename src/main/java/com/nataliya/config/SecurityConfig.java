@@ -1,7 +1,11 @@
 package com.nataliya.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nataliya.security.*;
+import com.nataliya.security.entrypoint.JsonAuthenticationEntryPoint;
+import com.nataliya.security.filter.JsonUsernamePasswordAuthenticationFilter;
+import com.nataliya.security.handler.HttpStatusLogoutSuccessHandler;
+import com.nataliya.security.handler.JsonAuthenticationFailureHandler;
+import com.nataliya.security.handler.JsonAuthenticationSuccessHandler;
 import com.nataliya.util.UserDtoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

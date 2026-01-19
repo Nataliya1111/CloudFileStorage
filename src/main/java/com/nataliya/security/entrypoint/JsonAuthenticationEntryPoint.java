@@ -1,4 +1,4 @@
-package com.nataliya.security;
+package com.nataliya.security.entrypoint;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nataliya.dto.ErrorResponseDto;
