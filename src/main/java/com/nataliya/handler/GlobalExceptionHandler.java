@@ -1,6 +1,7 @@
 package com.nataliya.handler;
 
 import com.nataliya.dto.ErrorResponseDto;
+import com.nataliya.exception.MinioStorageException;
 import com.nataliya.exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -46,9 +47,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(new ErrorResponseDto(message));
     }
 
+    @ExceptionHandler(MinioStorageException.class)
+    public ResponseEntity<ErrorResponseDto> handleException(MinioStorageException ex) {
+
+        log.error("Exception at MinioService: {}", ex.getMessage(), ex);
+
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorResponseDto(ex.getMessage()));
+    }
+
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponseDto> handleException(Exception ex, HttpServletRequest request){
+    public ResponseEntity<ErrorResponseDto> handleException(Exception ex, HttpServletRequest request) {
 
         log.error("Unhandled exception at [{} {}]: {}",
                 request.getMethod(),
@@ -60,7 +72,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponseDto("Unexpected server error. Please try again later."));
     }
-
 
 
 }
