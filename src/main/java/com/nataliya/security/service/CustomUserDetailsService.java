@@ -1,6 +1,7 @@
 package com.nataliya.security.service;
 
 import com.nataliya.model.User;
+import com.nataliya.security.model.AuthenticatedUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,10 +20,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("No user found with username: " + username));
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
-                .password(user.getPassword())
-                .roles(user.getRole().getAuthority())
-                .build();
+        return new AuthenticatedUser(user);
     }
 }
