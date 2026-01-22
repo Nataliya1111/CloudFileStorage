@@ -1,6 +1,6 @@
 package com.nataliya.util;
 
-import com.nataliya.dto.UserAuthenticationRequestDto;
+import com.nataliya.dto.user.UserAuthenticationRequestDto;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;

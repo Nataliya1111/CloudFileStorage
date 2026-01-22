@@ -1,7 +1,7 @@
 package com.nataliya.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nataliya.dto.UsernameResponseDto;
+import com.nataliya.dto.user.UsernameResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

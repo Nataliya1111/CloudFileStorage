@@ -1,4 +1,4 @@
-package com.nataliya.dto;
+package com.nataliya.dto.user;
 
 public record UsernameResponseDto(String username) {
 }

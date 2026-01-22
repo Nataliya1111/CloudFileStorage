@@ -1,6 +1,6 @@
 package com.nataliya.handler;
 
-import com.nataliya.dto.ErrorResponseDto;
+import com.nataliya.dto.error.ErrorResponseDto;
 import com.nataliya.exception.MinioStorageException;
 import com.nataliya.exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;

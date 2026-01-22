@@ -1,22 +1,22 @@
-package com.nataliya.dto;
+package com.nataliya.dto.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record UserRegistrationRequestDto(
-        @NotBlank(message = "Username should not be empty")
+        @NotBlank(message = "Username must not be empty")
         @Size(
                 min = 5, max = 20,
                 message = "Username must be {min} to {max} characters long"
         )
         @Pattern(
                 regexp = "^[a-zA-Z0-9]+[a-zA-Z_0-9]*[a-zA-Z0-9]+$",
-                message = "Username can contain only letters, digits or underscores (not the first or the last character)"
+                message = "Username can contain only latin letters, digits or underscores (not the first or the last character)"
         )
         String username,
 
-        @NotBlank(message = "Password should not be empty")
+        @NotBlank(message = "Password must not be empty")
         @Size(
                 min = 5, max = 20,
                 message = "Password must be {min} to {max} characters long"

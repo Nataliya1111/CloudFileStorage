@@ -1,7 +1,7 @@
 package com.nataliya.service;
 
-import com.nataliya.dto.UserRegistrationRequestDto;
-import com.nataliya.dto.UsernameResponseDto;
+import com.nataliya.dto.user.UserRegistrationRequestDto;
+import com.nataliya.dto.user.UsernameResponseDto;
 import com.nataliya.exception.UserAlreadyExistsException;
 import com.nataliya.model.Role;
 import com.nataliya.model.User;

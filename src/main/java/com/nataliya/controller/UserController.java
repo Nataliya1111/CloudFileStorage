@@ -1,6 +1,6 @@
 package com.nataliya.controller;
 
-import com.nataliya.dto.UsernameResponseDto;
+import com.nataliya.dto.user.UsernameResponseDto;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;

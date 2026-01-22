@@ -1,7 +1,7 @@
 package com.nataliya.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nataliya.dto.ErrorResponseDto;
+import com.nataliya.dto.error.ErrorResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;
