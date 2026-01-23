@@ -39,7 +39,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         String message = ex.getBindingResult().getFieldErrors().stream()
                 .map(error -> error.getDefaultMessage()).collect(Collectors.joining("; "));
 
-        log.info("Attempt to create user with invalid username or password");
+        log.info("Validation failed for {}: {}",
+                request.getDescription(false),
+                message);
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)

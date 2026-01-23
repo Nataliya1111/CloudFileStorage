@@ -30,7 +30,7 @@ public class RegistrationService {
 
         try {
             User savedUser = userRepository.save(user);
-            minioService.createUserFolder(savedUser.getId());
+            minioService.createUserRootDirectory(savedUser.getId());
             return new UsernameResponseDto(savedUser.getUsername());
         } catch (DataIntegrityViolationException ex) {
             if (ex.getCause() instanceof ConstraintViolationException) {
