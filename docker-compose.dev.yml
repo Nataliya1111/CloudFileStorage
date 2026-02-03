@@ -37,6 +37,13 @@ services:
       - ./minio-data:/data
       #- minio_data:/data
 
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+
 volumes:
   pgdata:
   redis_data:
