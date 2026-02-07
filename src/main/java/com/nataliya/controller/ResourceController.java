@@ -1,6 +1,6 @@
 package com.nataliya.controller;
 
-import com.nataliya.dto.resource.FilepathRequestDto;
+import com.nataliya.dto.resource.PathRequestDto;
 import com.nataliya.dto.resource.ResourceResponseDto;
 import com.nataliya.security.model.AuthenticatedUser;
 import com.nataliya.service.MinioService;
@@ -14,18 +14,18 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/resource")
 @RequiredArgsConstructor
 public class ResourceController {
 
     private final MinioService minioService;
 
-    @PostMapping("/resource")
+    @PostMapping
     public ResponseEntity<ResourceResponseDto> upload(@AuthenticationPrincipal AuthenticatedUser user,
-                                                      @Valid FilepathRequestDto filepathRequestDto,
+                                                      @Valid PathRequestDto pathRequestDto,
                                                       @RequestPart MultipartFile file) {
 
-        ResourceResponseDto responseDto = minioService.uploadFile(user.getId(), filepathRequestDto.path(), file);
+        ResourceResponseDto responseDto = minioService.uploadFile(user.getId(), pathRequestDto.path(), file);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
