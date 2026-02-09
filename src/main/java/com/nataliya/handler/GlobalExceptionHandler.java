@@ -2,6 +2,7 @@ package com.nataliya.handler;
 
 import com.nataliya.dto.error.ErrorResponseDto;
 import com.nataliya.exception.MinioStorageException;
+import com.nataliya.exception.ResourceNotFoundException;
 import com.nataliya.exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +61,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(new ErrorResponseDto(ex.getMessage()));
     }
 
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleException(ResourceNotFoundException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorResponseDto(ex.getMessage()));
+    }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleException(Exception ex, HttpServletRequest request) {
@@ -74,6 +84,5 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponseDto("Unexpected server error. Please try again later."));
     }
-
 
 }

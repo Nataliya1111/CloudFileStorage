@@ -3,7 +3,7 @@ package com.nataliya.dto.resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
-public record NewDirectoryRequestDto(
+public record ResourceRequestDto(
         @NotBlank(message = "Path must not be empty")
         @Pattern(
                 regexp = "^/?[^\\\\/:*?\"<>|]+(/[^\\\\/:*?\"<>|]+)*/?$",

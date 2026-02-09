@@ -1,14 +1,13 @@
 package com.nataliya.controller;
 
 import com.nataliya.dto.resource.PathRequestDto;
+import com.nataliya.dto.resource.ResourceRequestDto;
 import com.nataliya.dto.resource.ResourceResponseDto;
 import com.nataliya.security.model.AuthenticatedUser;
 import com.nataliya.service.MinioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,16 +19,20 @@ public class ResourceController {
 
     private final MinioService minioService;
 
+    @GetMapping
+    public ResourceResponseDto resourceInfo(@AuthenticationPrincipal AuthenticatedUser user,
+                                            @Valid ResourceRequestDto resourceRequestDto) {
+
+
+        return minioService.getResourceInfo(user.getId(), resourceRequestDto.path());
+    }
+
     @PostMapping
-    public ResponseEntity<ResourceResponseDto> upload(@AuthenticationPrincipal AuthenticatedUser user,
-                                                      @Valid PathRequestDto pathRequestDto,
-                                                      @RequestPart MultipartFile file) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResourceResponseDto upload(@AuthenticationPrincipal AuthenticatedUser user,
+                                      @Valid PathRequestDto pathRequestDto,
+                                      @RequestPart MultipartFile object) {
 
-        ResourceResponseDto responseDto = minioService.uploadFile(user.getId(), pathRequestDto.path(), file);
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(responseDto);
+        return minioService.uploadFile(user.getId(), pathRequestDto.path(), object);
     }
 }

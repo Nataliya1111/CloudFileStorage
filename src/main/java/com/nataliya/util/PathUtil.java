@@ -35,17 +35,23 @@ public final class PathUtil {
                 .replaceAll("//", "/");
     }
 
-    public static String getDirectoryName(String relativeDirectoryPath) {
-        relativeDirectoryPath = formatPath(relativeDirectoryPath, false, false);
-        int lastSlash = relativeDirectoryPath.lastIndexOf('/');
-        return relativeDirectoryPath.substring(lastSlash + 1);
+    public static String getFullResourcePath(String rootFolderName, Long userId, String relativeResourcePath) {
+        return (String.format(rootFolderName, userId) + relativeResourcePath)
+                .replaceAll("//", "/");
+    }
+
+    public static String getResourceName(String path, boolean requireTrailingSlash) {
+        path = formatPath(path, false, false);
+        int lastSlash = path.lastIndexOf('/');
+        String resourceName = path.substring(lastSlash + 1);
+        return requireTrailingSlash ? resourceName + "/" : resourceName;
 
     }
 
-    public static String getParentDirectoryPath(String relativeDirectoryPath) {
-        relativeDirectoryPath = formatPath(relativeDirectoryPath, false, false);
-        int lastSlash = relativeDirectoryPath.lastIndexOf('/');
-        return relativeDirectoryPath.substring(0, lastSlash + 1);
+    public static String getParentDirectoryPath(String path) {
+        path = formatPath(path, false, false);
+        int lastSlash = path.lastIndexOf('/');
+        return path.substring(0, lastSlash + 1);
     }
 
     public static String buildFullObjectName(String rootFolderName, Long userId, String relativeDirectoryPath) {
