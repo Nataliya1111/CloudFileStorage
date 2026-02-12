@@ -1,5 +1,6 @@
-package com.nataliya.model;
+package com.nataliya.model.entity;
 
+import com.nataliya.model.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

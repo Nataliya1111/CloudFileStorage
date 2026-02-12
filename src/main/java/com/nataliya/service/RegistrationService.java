@@ -4,7 +4,7 @@ import com.nataliya.dto.user.UserRegistrationRequestDto;
 import com.nataliya.dto.user.UsernameResponseDto;
 import com.nataliya.exception.UserAlreadyExistsException;
 import com.nataliya.model.Role;
-import com.nataliya.model.User;
+import com.nataliya.model.entity.User;
 import com.nataliya.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.exception.ConstraintViolationException;

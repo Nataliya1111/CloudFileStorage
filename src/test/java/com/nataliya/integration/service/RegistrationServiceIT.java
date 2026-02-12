@@ -2,7 +2,7 @@ package com.nataliya.integration.service;
 
 import com.nataliya.dto.user.UserRegistrationRequestDto;
 import com.nataliya.exception.UserAlreadyExistsException;
-import com.nataliya.model.User;
+import com.nataliya.model.entity.User;
 import com.nataliya.repository.UserRepository;
 import com.nataliya.service.RegistrationService;
 import org.junit.jupiter.api.Test;

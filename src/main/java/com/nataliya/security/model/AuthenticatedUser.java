@@ -1,6 +1,6 @@
 package com.nataliya.security.model;
 
-import com.nataliya.model.User;
+import com.nataliya.model.entity.User;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

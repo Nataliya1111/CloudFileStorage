@@ -1,6 +1,6 @@
 package com.nataliya.repository;
 
-import com.nataliya.model.User;
+import com.nataliya.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

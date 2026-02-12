@@ -1,6 +1,6 @@
 package com.nataliya.security.service;
 
-import com.nataliya.model.User;
+import com.nataliya.model.entity.User;
 import com.nataliya.security.model.AuthenticatedUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
