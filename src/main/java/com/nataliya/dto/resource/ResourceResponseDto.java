@@ -1,6 +1,7 @@
 package com.nataliya.dto.resource;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.nataliya.model.ResourceType;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ResourceResponseDto(
@@ -9,10 +10,6 @@ public record ResourceResponseDto(
         String size,
         ResourceType type
 ) {
-    public enum ResourceType {
-        FILE,
-        DIRECTORY
-    }
 
     public ResourceResponseDto(String path, String name, String size) {
         this(path, name, size, ResourceType.FILE);
