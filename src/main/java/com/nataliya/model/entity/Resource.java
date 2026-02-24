@@ -2,10 +2,7 @@ package com.nataliya.model.entity;
 
 import com.nataliya.model.ResourceType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class Resource {
 
     @Id
@@ -43,6 +41,5 @@ public class Resource {
     @Column(name = "resource_type", nullable = false)
     private ResourceType resourceType;
 
-    @Column
     private Long size;
 }

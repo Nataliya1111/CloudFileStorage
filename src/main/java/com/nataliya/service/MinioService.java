@@ -13,10 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -140,27 +137,15 @@ public class MinioService {
         }
     }
 
-    public ResourceResponseDto uploadFile(Long id, String relativeDirectoryPath, MultipartFile file) {
-
-        String filename = file.getOriginalFilename();
-        String filesize = Long.toString(file.getSize());
-
-        HashMap<String, String> metadata = new HashMap<>();
-        metadata.put(FILENAME_META, filename);
-        metadata.put(SIZE_META, filesize);
+    public void uploadFile(UUID objectKey, MultipartFile file) {
 
         try {
             minioClient.putObject(PutObjectArgs.builder()
                     .bucket(bucketName)
-                    .object(PathUtil.buildFullObjectName(properties.getUserRootDirectory(), id, relativeDirectoryPath))
+                    .object(objectKey.toString())
                     .stream(file.getInputStream(), file.getSize(), -1)
                     .contentType(file.getContentType())
-                    .userMetadata(metadata)
                     .build());
-            return new ResourceResponseDto(
-                    PathUtil.formatPath(relativeDirectoryPath, false, true),
-                    filename,
-                    filesize);
         } catch (Exception e) {
             throw new MinioStorageException("Failed to upload resource to MinIO storage", e);
         }

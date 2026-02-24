@@ -3,8 +3,6 @@ package com.nataliya.util;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PathUtil {
 
@@ -45,17 +43,12 @@ public final class PathUtil {
         int lastSlash = path.lastIndexOf('/');
         String resourceName = path.substring(lastSlash + 1);
         return requireTrailingSlash ? resourceName + "/" : resourceName;
-
     }
 
     public static String getParentDirectoryPath(String path) {
         path = formatPath(path, false, false);
         int lastSlash = path.lastIndexOf('/');
         return path.substring(0, lastSlash + 1);
-    }
-
-    public static String buildFullObjectName(String rootFolderName, Long userId, String relativeDirectoryPath) {
-        return getFullDirectoryPath(rootFolderName, userId, relativeDirectoryPath) + UUID.randomUUID();
     }
 
 }
