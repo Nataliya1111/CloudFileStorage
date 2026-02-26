@@ -2,7 +2,6 @@ package com.nataliya.service;
 
 import com.nataliya.dto.resource.ResourceResponseDto;
 import com.nataliya.exception.FileAlreadyExistsException;
-import com.nataliya.util.PathUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -24,14 +23,13 @@ public class FileUploadService {
 
         String filename = file.getOriginalFilename();
         long filesize = file.getSize();
-        String pathFormatted = PathUtil.formatPath(relativeDirectoryPath, false, true);
 
-        UUID objectKey = resourceMetadataService.createFileMetadata(userId, pathFormatted, filename, filesize);
+        UUID objectKey = resourceMetadataService.createFileMetadata(userId, relativeDirectoryPath, filename, filesize);
         minioService.uploadFile(objectKey, file);
 
         return new ResourceResponseDto(
-                pathFormatted,
+                relativeDirectoryPath,
                 filename,
-                Long.toString(filesize));
+                filesize);
     }
 }

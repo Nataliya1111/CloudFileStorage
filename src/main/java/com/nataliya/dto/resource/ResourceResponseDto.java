@@ -7,11 +7,11 @@ import com.nataliya.model.ResourceType;
 public record ResourceResponseDto(
         String path,
         String name,
-        String size,
+        Long size,
         ResourceType type
 ) {
 
-    public ResourceResponseDto(String path, String name, String size) {
+    public ResourceResponseDto(String path, String name, Long size) {
         this(path, name, size, ResourceType.FILE);
     }
 
