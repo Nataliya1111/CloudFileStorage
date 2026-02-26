@@ -33,18 +33,6 @@ public class MinioService {
         this.bucketName = properties.getBucketName();
     }
 
-    public void createUserRootDirectory(Long id) {
-        try {
-            minioClient.putObject(PutObjectArgs.builder()
-                    .bucket(bucketName)
-                    .object(String.format(properties.getUserRootDirectory(), id))
-                    .stream(new ByteArrayInputStream(new byte[]{}), 0, -1)
-                    .build());
-        } catch (Exception e) {
-            throw new MinioStorageException("Failed to create user folder in MinIO storage", e);
-        }
-    }
-
     public ResourceResponseDto getResourceInfo(Long id, String relativeResourcePath) {
 
         String prefix = PathUtil.getFullResourcePath(properties.getUserRootDirectory(), id, relativeResourcePath);

@@ -10,5 +10,10 @@ import java.util.UUID;
 @Repository
 public interface ResourceRepository extends JpaRepository<Resource, UUID> {
 
+    Optional<Resource> findByUserIdAndPath(Long userId, String path);
+
     Optional<Resource> findByUserIdAndParentIdAndResourceName(Long userId, UUID parentId, String resourceName);
+
+    boolean existsByUserIdAndParentIdAndResourceName(Long userId, UUID parentId, String resourceName);
+
 }

@@ -1,6 +1,7 @@
 package com.nataliya.handler;
 
 import com.nataliya.dto.error.ErrorResponseDto;
+import com.nataliya.exception.FilesNotUploadedException;
 import com.nataliya.exception.MinioStorageException;
 import com.nataliya.exception.ResourceNotFoundException;
 import com.nataliya.exception.UserAlreadyExistsException;
@@ -45,7 +46,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 message);
 
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(HttpStatus.BAD_REQUEST) //400
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ErrorResponseDto(message));
     }
@@ -62,10 +63,25 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponseDto> handleException(ResourceNotFoundException ex) {
+    public ResponseEntity<ErrorResponseDto> handleException(ResourceNotFoundException ex, HttpServletRequest request) {
+
+        log.warn("Exception at [{} {}]: {}",
+                request.getMethod(),
+                request.getRequestURI(),
+                ex.getMessage(),
+                ex);
 
         return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
+                .status(HttpStatus.NOT_FOUND) //404
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorResponseDto(ex.getMessage()));
+    }
+
+    @ExceptionHandler(FilesNotUploadedException.class)
+    public ResponseEntity<ErrorResponseDto> handleException(FilesNotUploadedException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT) //409
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ErrorResponseDto(ex.getMessage()));
     }

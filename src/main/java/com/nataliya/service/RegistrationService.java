@@ -18,7 +18,7 @@ public class RegistrationService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final MinioService minioService;
+    private final ResourceMetadataService resourceMetadataService;
 
     public UsernameResponseDto registerUser(UserRegistrationRequestDto userRequestDto) {
 
@@ -30,7 +30,7 @@ public class RegistrationService {
 
         try {
             User savedUser = userRepository.save(user);
-            minioService.createUserRootDirectory(savedUser.getId());
+            resourceMetadataService.createRootDirectoryMetadata(savedUser.getId());
             return new UsernameResponseDto(savedUser.getUsername());
         } catch (DataIntegrityViolationException ex) {
             if (ex.getCause() instanceof ConstraintViolationException) {
@@ -40,5 +40,4 @@ public class RegistrationService {
             }
         }
     }
-
 }
