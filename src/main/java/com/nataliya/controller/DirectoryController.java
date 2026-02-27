@@ -4,6 +4,7 @@ import com.nataliya.dto.resource.ResourceRequestDto;
 import com.nataliya.dto.resource.PathRequestDto;
 import com.nataliya.dto.resource.ResourceResponseDto;
 import com.nataliya.security.model.AuthenticatedUser;
+import com.nataliya.service.FileSystemService;
 import com.nataliya.service.MinioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +20,14 @@ import java.util.List;
 public class DirectoryController {
 
     private final MinioService minioService;
+    private final FileSystemService fileSystemService;
 
     @GetMapping
     public List<ResourceResponseDto> listDirectoryContents(
             @AuthenticationPrincipal AuthenticatedUser user,
             @Valid PathRequestDto pathRequestDto) {
 
-        return minioService.listDirectoryContents(user.getId(), pathRequestDto.path());
+        return fileSystemService.listDirectoryContents(user.getId(), pathRequestDto.path());
     }
 
     @PostMapping

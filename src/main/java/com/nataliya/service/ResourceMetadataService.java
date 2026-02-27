@@ -12,6 +12,7 @@ import com.nataliya.util.PathUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -44,12 +45,16 @@ public class ResourceMetadataService {
 
         Resource targetDirectory = findTargetDirectory(userId, directoryPath);
 
-        String relativePathToFile = PathUtil.getParentDirectoryPath(fullFileName);
-        String fileName = PathUtil.getResourceName(fullFileName, false);
+        String relativePathToFile = PathUtil.extractParentDirectoryPath(fullFileName);
+        String fileName = PathUtil.extractResourceName(fullFileName, false);
 
         Resource deepestDirectory = createDirectories(user, relativePathToFile, targetDirectory);
 
         return createFile(user, deepestDirectory, fileName, filesize);
+    }
+
+    public List<Resource> getDirectoryContentsList(Long userId, String directoryPath) {
+        return resourceRepository.findAllByUserIdAndParentPath(userId, directoryPath);
     }
 
     private Resource findTargetDirectory(Long userId, String directoryPath) {

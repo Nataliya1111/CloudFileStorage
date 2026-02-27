@@ -3,9 +3,13 @@ package com.nataliya.service;
 import com.nataliya.dto.resource.ResourceResponseDto;
 import com.nataliya.exception.FileAlreadyExistsException;
 import com.nataliya.exception.FilesNotUploadedException;
+import com.nataliya.mapper.ResourceMapper;
+import com.nataliya.model.entity.Resource;
+import com.nataliya.util.PathUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -17,8 +21,18 @@ import java.util.List;
 public class FileSystemService {
 
     private final ResourceMetadataService resourceMetadataService;
-    private final MinioService minioService;
     private final FileUploadService fileUploadService;
+    private final ResourceMapper resourceMapper;
+
+    @Transactional(readOnly = true)
+    public List<ResourceResponseDto> listDirectoryContents(Long userId, String relativeDirectoryPath) {
+
+        String pathFormatted = PathUtil.formatPath(relativeDirectoryPath, false, true);
+
+        List<Resource> directoryContentsList = resourceMetadataService.getDirectoryContentsList(userId, pathFormatted);
+
+        return resourceMapper.resourceListToDtoList(directoryContentsList);
+    }
 
     public List<ResourceResponseDto> uploadFiles(Long userId, String relativeDirectoryPath, List<MultipartFile> files) {
 
@@ -26,10 +40,11 @@ public class FileSystemService {
         List<String> failedFilePaths = new ArrayList<>();
 
         for (MultipartFile file : files) {
+            String pathFormatted = PathUtil.formatPath(relativeDirectoryPath, false, true);
 
             try {
                 ResourceResponseDto responseDto = fileUploadService
-                        .uploadSingleFile(userId, file, relativeDirectoryPath);
+                        .uploadSingleFile(userId, file, pathFormatted);
                 uploadedResourcesDtos.add(responseDto);
             } catch (FileAlreadyExistsException e) {
                 log.info("Attempt to save duplicate file {}", e.getFilePath());
