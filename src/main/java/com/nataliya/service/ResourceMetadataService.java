@@ -53,8 +53,21 @@ public class ResourceMetadataService {
         return createFile(user, deepestDirectory, fileName, filesize);
     }
 
+//    public Resource createEmptyDirectory(Long userId, String directoryPath){
+//
+//    }
+
     public List<Resource> getDirectoryContentsList(Long userId, String directoryPath) {
+
+        checkDirectoryExistence(userId, directoryPath);
         return resourceRepository.findAllByUserIdAndParentPath(userId, directoryPath);
+    }
+
+    private void checkDirectoryExistence(Long userId, String directoryPath){
+        if (!resourceRepository.existsByUserIdAndPath(userId, directoryPath)){
+            throw new ResourceNotFoundException(String
+                    .format("Directory '%s' of user with userId=%d is not found", directoryPath, userId));
+        }
     }
 
     private Resource findTargetDirectory(Long userId, String directoryPath) {
