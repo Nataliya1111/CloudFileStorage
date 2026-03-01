@@ -5,7 +5,6 @@ import com.nataliya.dto.resource.PathRequestDto;
 import com.nataliya.dto.resource.ResourceResponseDto;
 import com.nataliya.security.model.AuthenticatedUser;
 import com.nataliya.service.FileSystemService;
-import com.nataliya.service.MinioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,7 +18,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DirectoryController {
 
-    private final MinioService minioService;
     private final FileSystemService fileSystemService;
 
     @GetMapping
@@ -34,8 +32,8 @@ public class DirectoryController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResourceResponseDto createEmptyDirectory(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @Valid ResourceRequestDto directoryRequestDto) {
+            @Valid ResourceRequestDto newDirectoryRequestDto) {
 
-        return minioService.createEmptyDirectory(user.getId(), directoryRequestDto.path());
+        return fileSystemService.createEmptyDirectory(user.getId(), newDirectoryRequestDto.path());
     }
 }

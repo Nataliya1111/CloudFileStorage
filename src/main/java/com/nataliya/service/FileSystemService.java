@@ -30,18 +30,19 @@ public class FileSystemService {
 
         String pathFormatted = PathUtil.formatPath(relativeDirectoryPath, false, true);
 
-        List<Resource> directoryContentsList = resourceMetadataService.getDirectoryContentsList(userId, pathFormatted);
-
+        List<Resource> directoryContentsList = resourceMetadataService
+                .getDirectoryContentsList(userId, pathFormatted);
         return resourceMapper.resourceListToDtoList(directoryContentsList);
     }
 
-//    @Transactional
-//    public ResourceResponseDto createEmptyDirectory(Long id, String relativeDirectoryPath){
-//
-//        String pathFormatted = PathUtil.formatPath(relativeDirectoryPath, false, true);
-//
-//
-//    }
+    @Transactional
+    public ResourceResponseDto createEmptyDirectory(Long userId, String relativeDirectoryPath) {
+
+        String pathFormatted = PathUtil.formatPath(relativeDirectoryPath, false, true);
+
+        Resource emptyDirectory = resourceMetadataService.createEmptyDirectory(userId, pathFormatted);
+        return resourceMapper.resourceToResourceDto(emptyDirectory);
+    }
 
     public List<ResourceResponseDto> uploadFiles(Long userId, String relativeDirectoryPath, List<MultipartFile> files) {
 
@@ -90,7 +91,6 @@ public class FileSystemService {
                 failedCount,
                 failedFilesList
         );
-
         return new PartialUploadException(message);
     }
 }

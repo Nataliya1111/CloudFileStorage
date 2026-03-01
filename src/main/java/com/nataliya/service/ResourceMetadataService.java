@@ -2,6 +2,7 @@ package com.nataliya.service;
 
 import com.github.f4b6a3.uuid.UuidCreator;
 import com.nataliya.exception.FileAlreadyExistsException;
+import com.nataliya.exception.ResourceConflictException;
 import com.nataliya.exception.ResourceNotFoundException;
 import com.nataliya.model.ResourceType;
 import com.nataliya.model.entity.Resource;
@@ -9,7 +10,6 @@ import com.nataliya.model.entity.User;
 import com.nataliya.repository.ResourceRepository;
 import com.nataliya.repository.UserRepository;
 import com.nataliya.util.PathUtil;
-import com.nataliya.util.ResourceValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,6 @@ public class ResourceMetadataService {
 
     private final UserRepository userRepository;
     private final ResourceRepository resourceRepository;
-    private final ResourceValidator resourceValidator;
 
     public void createRootDirectoryMetadata(Long userId) {
 
@@ -46,7 +45,7 @@ public class ResourceMetadataService {
 
         User user = userRepository.getReferenceById(userId);
 
-        Resource targetDirectory = findDirectory(userId, directoryPath);
+        Resource targetDirectory = findDirectory(userId, user.getUsername(), directoryPath);
 
         String relativePathToFile = PathUtil.extractParentDirectoryPath(fullFileName);
         String fileName = PathUtil.extractResourceName(fullFileName, false);
@@ -56,24 +55,50 @@ public class ResourceMetadataService {
         return createFileMetadataEntry(user, deepestDirectory, fileName, filesize);
     }
 
-//    public Resource createEmptyDirectory(Long userId, String directoryPath){
-//
-//        resourceValidator.requireDirectoryDoesNotExist(userId, directoryPath);
-//        resourceRepository.
-//
-//    }
+    public Resource createEmptyDirectory(Long userId, String directoryPath) {
+
+        User user = userRepository.getReferenceById(userId);
+        String directoryName = PathUtil.extractResourceName(directoryPath, false);
+        String relativePathToDirectory = PathUtil.extractParentDirectoryPath(directoryPath);
+        Resource parent = findDirectory(userId, user.getUsername(), relativePathToDirectory);
+
+        Resource directory = Resource.builder()
+                .id(UuidCreator.getTimeOrderedEpoch())
+                .user(user)
+                .resourceName(directoryName)
+                .parent(parent)
+                .path(directoryPath)
+                .resourceType(ResourceType.DIRECTORY)
+                .build();
+
+        try {
+            resourceRepository.saveAndFlush(directory);
+            return directory;
+        } catch (DataIntegrityViolationException e) {
+            throw new ResourceConflictException(String
+                    .format("Directory '%s' of user %s already exists", directoryPath, user.getUsername()));
+        }
+    }
 
     public List<Resource> getDirectoryContentsList(Long userId, String directoryPath) {
 
-        resourceValidator.requireDirectoryExists(userId, directoryPath);
+        User user = userRepository.getReferenceById(userId);
+        requireDirectoryExists(userId, user.getUsername(), directoryPath);
         return resourceRepository.findAllByUserIdAndParentPath(userId, directoryPath);
     }
 
-    private Resource findDirectory(Long userId, String directoryPath) {
+    private Resource findDirectory(Long userId, String username, String directoryPath) {
 
         return resourceRepository.findByUserIdAndPath(userId, directoryPath)
                 .orElseThrow(() -> new ResourceNotFoundException(String
-                        .format("Directory '%s' of user with userId=%d is not found", directoryPath, userId)));
+                        .format("Directory '%s' of user %s is not found", directoryPath, username)));
+    }
+
+    private void requireDirectoryExists(Long userId, String username, String directoryPath) {
+        if (!resourceRepository.existsByUserIdAndPath(userId, directoryPath)) {
+            throw new ResourceNotFoundException(String
+                    .format("Directory '%s' of user %s is not found", directoryPath, username));
+        }
     }
 
     private Resource createDirectoryHierarchyMetadata(User user, String relativePathToFile, Resource targetDirectory) {
