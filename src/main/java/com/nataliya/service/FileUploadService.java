@@ -1,14 +1,12 @@
 package com.nataliya.service;
 
-import com.nataliya.dto.resource.ResourceResponseDto;
 import com.nataliya.exception.FileAlreadyExistsException;
+import com.nataliya.model.entity.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -18,18 +16,15 @@ public class FileUploadService {
     private final MinioService minioService;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public ResourceResponseDto uploadSingleFile(Long userId, MultipartFile file, String relativeDirectoryPath)
+    public Resource uploadSingleFile(Long userId, MultipartFile file, String relativeDirectoryPath)
             throws FileAlreadyExistsException {
 
         String filename = file.getOriginalFilename();
         long filesize = file.getSize();
 
-        UUID objectKey = resourceMetadataService.createFileMetadata(userId, relativeDirectoryPath, filename, filesize);
-        minioService.uploadFile(objectKey, file);
+        Resource fileMetadata = resourceMetadataService.createFileMetadata(userId, relativeDirectoryPath, filename, filesize);
+        minioService.uploadFile(fileMetadata.getId(), file);
 
-        return new ResourceResponseDto(
-                relativeDirectoryPath,
-                filename,
-                filesize);
+        return fileMetadata;
     }
 }

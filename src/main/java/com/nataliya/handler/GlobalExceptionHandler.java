@@ -1,10 +1,7 @@
 package com.nataliya.handler;
 
 import com.nataliya.dto.error.ErrorResponseDto;
-import com.nataliya.exception.FilesNotUploadedException;
-import com.nataliya.exception.MinioStorageException;
-import com.nataliya.exception.ResourceNotFoundException;
-import com.nataliya.exception.UserAlreadyExistsException;
+import com.nataliya.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -77,8 +74,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(new ErrorResponseDto(ex.getMessage()));
     }
 
-    @ExceptionHandler(FilesNotUploadedException.class)
-    public ResponseEntity<ErrorResponseDto> handleException(FilesNotUploadedException ex) {
+    @ExceptionHandler(ResourceConflictException.class)
+    public ResponseEntity<ErrorResponseDto> handleException(ResourceConflictException ex, HttpServletRequest request) {
+
+        log.info("Exception at [{} {}]: {}",
+                request.getMethod(),
+                request.getRequestURI(),
+                ex.getMessage(),
+                ex);
 
         return ResponseEntity
                 .status(HttpStatus.CONFLICT) //409
@@ -86,6 +89,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(new ErrorResponseDto(ex.getMessage()));
     }
 
+    @ExceptionHandler(PartialUploadException.class)
+    public ResponseEntity<ErrorResponseDto> handleException(PartialUploadException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT) //409
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorResponseDto(ex.getMessage()));
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleException(Exception ex, HttpServletRequest request) {

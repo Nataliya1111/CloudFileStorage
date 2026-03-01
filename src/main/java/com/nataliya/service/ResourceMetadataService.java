@@ -9,7 +9,9 @@ import com.nataliya.model.entity.User;
 import com.nataliya.repository.ResourceRepository;
 import com.nataliya.repository.UserRepository;
 import com.nataliya.util.PathUtil;
+import com.nataliya.util.ResourceValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +23,7 @@ public class ResourceMetadataService {
 
     private final UserRepository userRepository;
     private final ResourceRepository resourceRepository;
+    private final ResourceValidator resourceValidator;
 
     public void createRootDirectoryMetadata(Long userId) {
 
@@ -39,45 +42,41 @@ public class ResourceMetadataService {
         resourceRepository.save(rootDirectory);
     }
 
-    public UUID createFileMetadata(Long userId, String directoryPath, String fullFileName, long filesize) throws FileAlreadyExistsException {
+    public Resource createFileMetadata(Long userId, String directoryPath, String fullFileName, long filesize) throws FileAlreadyExistsException {
 
         User user = userRepository.getReferenceById(userId);
 
-        Resource targetDirectory = findTargetDirectory(userId, directoryPath);
+        Resource targetDirectory = findDirectory(userId, directoryPath);
 
         String relativePathToFile = PathUtil.extractParentDirectoryPath(fullFileName);
         String fileName = PathUtil.extractResourceName(fullFileName, false);
 
-        Resource deepestDirectory = createDirectories(user, relativePathToFile, targetDirectory);
+        Resource deepestDirectory = createDirectoryHierarchyMetadata(user, relativePathToFile, targetDirectory);
 
-        return createFile(user, deepestDirectory, fileName, filesize);
+        return createFileMetadataEntry(user, deepestDirectory, fileName, filesize);
     }
 
 //    public Resource createEmptyDirectory(Long userId, String directoryPath){
+//
+//        resourceValidator.requireDirectoryDoesNotExist(userId, directoryPath);
+//        resourceRepository.
 //
 //    }
 
     public List<Resource> getDirectoryContentsList(Long userId, String directoryPath) {
 
-        checkDirectoryExistence(userId, directoryPath);
+        resourceValidator.requireDirectoryExists(userId, directoryPath);
         return resourceRepository.findAllByUserIdAndParentPath(userId, directoryPath);
     }
 
-    private void checkDirectoryExistence(Long userId, String directoryPath){
-        if (!resourceRepository.existsByUserIdAndPath(userId, directoryPath)){
-            throw new ResourceNotFoundException(String
-                    .format("Directory '%s' of user with userId=%d is not found", directoryPath, userId));
-        }
-    }
-
-    private Resource findTargetDirectory(Long userId, String directoryPath) {
+    private Resource findDirectory(Long userId, String directoryPath) {
 
         return resourceRepository.findByUserIdAndPath(userId, directoryPath)
                 .orElseThrow(() -> new ResourceNotFoundException(String
                         .format("Directory '%s' of user with userId=%d is not found", directoryPath, userId)));
     }
 
-    private Resource createDirectories(User user, String relativePathToFile, Resource targetDirectory) {
+    private Resource createDirectoryHierarchyMetadata(User user, String relativePathToFile, Resource targetDirectory) {
         if (relativePathToFile == null || relativePathToFile.isBlank()) {
             return targetDirectory;
         }
@@ -85,7 +84,7 @@ public class ResourceMetadataService {
         String[] directoryNames = relativePathToFile.split("/");
 
         Resource parent = targetDirectory;
-        String path = "";
+        String path = targetDirectory.getPath().equals("/") ? "" : targetDirectory.getPath();
 
         for (String directoryName : directoryNames) {
 
@@ -117,7 +116,7 @@ public class ResourceMetadataService {
                 .orElseGet(() -> resourceRepository.save(resource));
     }
 
-    private UUID createFile(User user, Resource parent, String fileName, long size) throws FileAlreadyExistsException {
+    private Resource createFileMetadataEntry(User user, Resource parent, String fileName, long size) throws FileAlreadyExistsException {
         UUID fileId = UuidCreator.getTimeOrderedEpoch();
         String filePath = parent != null ? parent.getPath() + fileName : fileName;
 
@@ -131,17 +130,14 @@ public class ResourceMetadataService {
                 .size(size)
                 .build();
 
-        boolean fileExists = resourceRepository
-                .existsByUserIdAndParentIdAndResourceName(
-                        user.getId(),
-                        parent != null ? parent.getId() : null,
-                        fileName
-                );
-        if (fileExists) {
-            throw new FileAlreadyExistsException("File already Exists in resources table", filePath);
+        try {
+            resourceRepository.saveAndFlush(file);
+            return file;
+        } catch (DataIntegrityViolationException e) {
+            String message = String
+                    .format("File '%s' in directory '%s' of user with userId=%d already exists", fileName, filePath, user.getId());
+            throw new FileAlreadyExistsException(message, filePath);
         }
-        resourceRepository.save(file);
-        return fileId;
     }
 
 }

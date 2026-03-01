@@ -19,6 +19,4 @@ public interface ResourceRepository extends JpaRepository<Resource, UUID> {
 
     boolean existsByUserIdAndPath(Long userId, String parentPath);
 
-    boolean existsByUserIdAndParentIdAndResourceName(Long userId, UUID parentId, String resourceName);
-
 }

@@ -2,7 +2,8 @@ package com.nataliya.service;
 
 import com.nataliya.dto.resource.ResourceResponseDto;
 import com.nataliya.exception.FileAlreadyExistsException;
-import com.nataliya.exception.FilesNotUploadedException;
+import com.nataliya.exception.PartialUploadException;
+import com.nataliya.exception.ResourceConflictException;
 import com.nataliya.mapper.ResourceMapper;
 import com.nataliya.model.entity.Resource;
 import com.nataliya.util.PathUtil;
@@ -34,32 +35,46 @@ public class FileSystemService {
         return resourceMapper.resourceListToDtoList(directoryContentsList);
     }
 
+//    @Transactional
+//    public ResourceResponseDto createEmptyDirectory(Long id, String relativeDirectoryPath){
+//
+//        String pathFormatted = PathUtil.formatPath(relativeDirectoryPath, false, true);
+//
+//
+//    }
+
     public List<ResourceResponseDto> uploadFiles(Long userId, String relativeDirectoryPath, List<MultipartFile> files) {
 
-        List<ResourceResponseDto> uploadedResourcesDtos = new ArrayList<>();
+        List<Resource> uploadedResources = new ArrayList<>();
         List<String> failedFilePaths = new ArrayList<>();
 
         for (MultipartFile file : files) {
             String pathFormatted = PathUtil.formatPath(relativeDirectoryPath, false, true);
 
             try {
-                ResourceResponseDto responseDto = fileUploadService
+                Resource fileMetadata = fileUploadService
                         .uploadSingleFile(userId, file, pathFormatted);
-                uploadedResourcesDtos.add(responseDto);
+                uploadedResources.add(fileMetadata);
             } catch (FileAlreadyExistsException e) {
                 log.info("Attempt to save duplicate file {}", e.getFilePath());
                 failedFilePaths.add(e.getFilePath());
             }
         }
+        ensureAtLeastOneFileUploaded(uploadedResources);
 
         if (!failedFilePaths.isEmpty()) {
-            throw buildFilesNotUploadedException(files.size(), failedFilePaths);
+            throw buildPartialUploadException(files.size(), failedFilePaths);
         }
-
-        return uploadedResourcesDtos;
+        return resourceMapper.resourceListToDtoList(uploadedResources);
     }
 
-    private FilesNotUploadedException buildFilesNotUploadedException(
+    private void ensureAtLeastOneFileUploaded(List<Resource> uploadedResources) {
+        if (uploadedResources.isEmpty()) {
+            throw new ResourceConflictException("No files uploaded: all files already exist in the target directory.");
+        }
+    }
+
+    private PartialUploadException buildPartialUploadException(
             int totalFiles,
             List<String> failedFilePaths) {
 
@@ -76,6 +91,6 @@ public class FileSystemService {
                 failedFilesList
         );
 
-        return new FilesNotUploadedException(message);
+        return new PartialUploadException(message);
     }
 }

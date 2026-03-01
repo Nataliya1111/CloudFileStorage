@@ -3,7 +3,7 @@ package com.nataliya.exception;
 import lombok.Getter;
 
 @Getter
-public class FileAlreadyExistsException extends Exception {
+public class FileAlreadyExistsException extends RuntimeException {
 
     private final String filePath;
 
