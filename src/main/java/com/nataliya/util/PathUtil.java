@@ -6,6 +6,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PathUtil {
 
+    public static String normalizePath(String path) {
+        if (path == null || path.isBlank()) {
+            return "/";
+        }
+        return path.startsWith("/") ? path.substring(1) : path;
+    }
+
     public static String formatPath(String path, boolean requireLeadingSlash, boolean requireTrailingSlash) {
         if (path == null || path.isBlank()) {
             return "/";
@@ -27,12 +34,6 @@ public final class PathUtil {
         return formatted.isEmpty() ? "/" : formatted;
     }
 
-    public static String getFullDirectoryPath(String rootFolderName, Long userId, String relativeDirectoryPath) {
-        relativeDirectoryPath = formatPath(relativeDirectoryPath, false, true);
-        return (String.format(rootFolderName, userId) + relativeDirectoryPath)
-                .replaceAll("//", "/");
-    }
-
     public static String extractResourceName(String path, boolean requireTrailingSlash) {
         path = formatPath(path, false, false);
         int lastSlash = path.lastIndexOf('/');
@@ -45,5 +46,4 @@ public final class PathUtil {
         int lastSlash = path.lastIndexOf('/');
         return path.substring(0, lastSlash + 1);
     }
-
 }

@@ -15,6 +15,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -45,7 +46,7 @@ public class ResourceMetadataService {
 
         User user = userRepository.getReferenceById(userId);
 
-        Resource targetDirectory = findDirectory(userId, user.getUsername(), directoryPath);
+        Resource targetDirectory = findResource(userId, user.getUsername(), directoryPath, ResourceType.DIRECTORY);
 
         String relativePathToFile = PathUtil.extractParentDirectoryPath(fullFileName);
         String fileName = PathUtil.extractResourceName(fullFileName, false);
@@ -60,7 +61,7 @@ public class ResourceMetadataService {
         User user = userRepository.getReferenceById(userId);
         String directoryName = PathUtil.extractResourceName(directoryPath, false);
         String relativePathToDirectory = PathUtil.extractParentDirectoryPath(directoryPath);
-        Resource parent = findDirectory(userId, user.getUsername(), relativePathToDirectory);
+        Resource parent = findResource(userId, user.getUsername(), relativePathToDirectory, ResourceType.DIRECTORY);
 
         Resource directory = Resource.builder()
                 .id(UuidCreator.getTimeOrderedEpoch())
@@ -80,24 +81,32 @@ public class ResourceMetadataService {
         }
     }
 
+    public Resource getResource(Long userId, String resourcePath) {
+
+        User user = userRepository.getReferenceById(userId);
+        ResourceType type = resourcePath.endsWith("/") ? ResourceType.DIRECTORY : ResourceType.FILE;
+
+        return findResource(userId, user.getUsername(), resourcePath, type);
+    }
+
     public List<Resource> getDirectoryContentsList(Long userId, String directoryPath) {
 
         User user = userRepository.getReferenceById(userId);
-        requireDirectoryExists(userId, user.getUsername(), directoryPath);
+        requireResourceExists(userId, user.getUsername(), directoryPath, ResourceType.DIRECTORY);
         return resourceRepository.findAllByUserIdAndParentPath(userId, directoryPath);
     }
 
-    private Resource findDirectory(Long userId, String username, String directoryPath) {
+    private Resource findResource(Long userId, String username, String resourcePath, ResourceType type) {
 
-        return resourceRepository.findByUserIdAndPath(userId, directoryPath)
+        return resourceRepository.findByUserIdAndPath(userId, resourcePath)
                 .orElseThrow(() -> new ResourceNotFoundException(String
-                        .format("Directory '%s' of user %s is not found", directoryPath, username)));
+                        .format("%s '%s' of user %s is not found", type, resourcePath, username)));
     }
 
-    private void requireDirectoryExists(Long userId, String username, String directoryPath) {
-        if (!resourceRepository.existsByUserIdAndPath(userId, directoryPath)) {
+    private void requireResourceExists(Long userId, String username, String resourcePath, ResourceType type) {
+        if (!resourceRepository.existsByUserIdAndPath(userId, resourcePath)) {
             throw new ResourceNotFoundException(String
-                    .format("Directory '%s' of user %s is not found", directoryPath, username));
+                    .format("%s '%s' of user %s is not found", type, resourcePath, username));
         }
     }
 
@@ -126,19 +135,35 @@ public class ResourceMetadataService {
                     .path(path)
                     .resourceType(ResourceType.DIRECTORY)
                     .build();
-            parent = getOrSaveDirectory(directory);
+            parent = getOrCrateDirectory(directory);
         }
         return parent;
     }
 
-    private Resource getOrSaveDirectory(Resource resource) {
-        return resourceRepository
+    private Resource getOrCrateDirectory(Resource directory) {
+
+        Optional<Resource> existing = resourceRepository
                 .findByUserIdAndParentIdAndResourceName(
-                        resource.getUser().getId(),
-                        resource.getParent() != null ? resource.getParent().getId() : null,
-                        resource.getResourceName()
-                )
-                .orElseGet(() -> resourceRepository.save(resource));
+                        directory.getUser().getId(),
+                        directory.getParent() != null ? directory.getParent().getId() : null,
+                        directory.getResourceName()
+                );
+
+        if (existing.isPresent()) {
+            Resource resource = existing.get();
+
+            if (resource.getResourceType() != ResourceType.DIRECTORY) {
+                throw new ResourceConflictException(
+                        String.format(
+                                "'%s' already exists and is a file",
+                                resource.getPath()
+                        )
+                );
+            }
+
+            return resource;
+        }
+        return resourceRepository.save(directory);
     }
 
     private Resource createFileMetadataEntry(User user, Resource parent, String fileName, long size) throws FileAlreadyExistsException {
@@ -154,7 +179,6 @@ public class ResourceMetadataService {
                 .resourceType(ResourceType.FILE)
                 .size(size)
                 .build();
-
         try {
             resourceRepository.saveAndFlush(file);
             return file;
@@ -164,5 +188,4 @@ public class ResourceMetadataService {
             throw new FileAlreadyExistsException(message, filePath);
         }
     }
-
 }

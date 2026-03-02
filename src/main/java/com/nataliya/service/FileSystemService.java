@@ -26,6 +26,15 @@ public class FileSystemService {
     private final ResourceMapper resourceMapper;
 
     @Transactional(readOnly = true)
+    public ResourceResponseDto getResourceInfo(Long userId, String resourcePath) {
+
+        String pathFormatted = PathUtil.normalizePath(resourcePath);
+
+        Resource resource = resourceMetadataService.getResource(userId, pathFormatted);
+        return resourceMapper.resourceToResourceDto(resource);
+    }
+
+    @Transactional(readOnly = true)
     public List<ResourceResponseDto> listDirectoryContents(Long userId, String relativeDirectoryPath) {
 
         String pathFormatted = PathUtil.formatPath(relativeDirectoryPath, false, true);

@@ -5,7 +5,6 @@ import com.nataliya.dto.resource.ResourceRequestDto;
 import com.nataliya.dto.resource.ResourceResponseDto;
 import com.nataliya.security.model.AuthenticatedUser;
 import com.nataliya.service.FileSystemService;
-import com.nataliya.service.MinioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,22 +19,20 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ResourceController {
 
-    private final MinioService minioService;
     private final FileSystemService fileSystemService;
 
     @GetMapping
     public ResourceResponseDto resourceInfo(@AuthenticationPrincipal AuthenticatedUser user,
                                             @Valid ResourceRequestDto resourceRequestDto) {
 
-
-        return minioService.getResourceInfo(user.getId(), resourceRequestDto.path());
+        return fileSystemService.getResourceInfo(user.getId(), resourceRequestDto.path());
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public List<ResourceResponseDto> upload(@AuthenticationPrincipal AuthenticatedUser user,
-                                      @Valid PathRequestDto pathRequestDto,
-                                      @RequestPart ("object") List<MultipartFile> objects) {
+                                            @Valid PathRequestDto pathRequestDto,
+                                            @RequestPart("object") List<MultipartFile> objects) {
 
         return fileSystemService.uploadFiles(user.getId(), pathRequestDto.path(), objects);
     }
