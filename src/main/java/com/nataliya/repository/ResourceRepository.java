@@ -17,6 +17,8 @@ public interface ResourceRepository extends JpaRepository<Resource, UUID> {
 
     List<Resource> findAllByUserIdAndParentPath(Long userId, String parentPath);
 
+    List<Resource> findByUserIdAndPathStartingWith(Long userId, String path);
+
     boolean existsByUserIdAndPath(Long userId, String parentPath);
 
 }

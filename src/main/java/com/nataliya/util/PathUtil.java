@@ -46,4 +46,14 @@ public final class PathUtil {
         int lastSlash = path.lastIndexOf('/');
         return path.substring(0, lastSlash + 1);
     }
+
+    public static String extractRelativePath(String fullPath, String resourcePath) {
+        return fullPath.substring(resourcePath.length());
+    }
+
+    public static String extractZipPath(String fullPath, String resourcePath) {
+        String relativePath = extractRelativePath(fullPath, resourcePath);
+        String rootFolder = extractResourceName(resourcePath, true);
+        return rootFolder + relativePath;
+    }
 }

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.util.*;
 
 @Service
@@ -34,6 +35,17 @@ public class MinioService {
                     .build());
         } catch (Exception e) {
             throw new MinioStorageException("Failed to upload resource to MinIO storage", e);
+        }
+    }
+
+    public InputStream getFileStream(UUID objectKey) {
+        try {
+            return minioClient.getObject(GetObjectArgs.builder()
+                    .bucket(bucketName)
+                    .object(objectKey.toString())
+                    .build());
+        } catch (Exception e) {
+            throw new MinioStorageException("Failed to download resource from MinIO storage", e);
         }
     }
 }

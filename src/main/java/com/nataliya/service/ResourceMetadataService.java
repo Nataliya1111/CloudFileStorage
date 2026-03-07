@@ -42,11 +42,20 @@ public class ResourceMetadataService {
         resourceRepository.save(rootDirectory);
     }
 
+    public Resource getResource(Long userId, String resourcePath) {
+
+        ResourceType type = resourcePath.endsWith("/") ? ResourceType.DIRECTORY : ResourceType.FILE;
+
+        return resourceRepository.findByUserIdAndPath(userId, resourcePath)
+                .orElseThrow(() -> new ResourceNotFoundException(String
+                        .format("%s '%s' of user with id '%d' is not found", type, resourcePath, userId)));
+    }
+
     public Resource createFileMetadata(Long userId, String directoryPath, String fullFileName, long filesize) throws FileAlreadyExistsException {
 
         User user = userRepository.getReferenceById(userId);
 
-        Resource targetDirectory = findResource(userId, user.getUsername(), directoryPath, ResourceType.DIRECTORY);
+        Resource targetDirectory = getResource(userId, directoryPath);
 
         String relativePathToFile = PathUtil.extractParentDirectoryPath(fullFileName);
         String fileName = PathUtil.extractResourceName(fullFileName, false);
@@ -61,7 +70,7 @@ public class ResourceMetadataService {
         User user = userRepository.getReferenceById(userId);
         String directoryName = PathUtil.extractResourceName(directoryPath, false);
         String relativePathToDirectory = PathUtil.extractParentDirectoryPath(directoryPath);
-        Resource parent = findResource(userId, user.getUsername(), relativePathToDirectory, ResourceType.DIRECTORY);
+        Resource parent = getResource(userId, relativePathToDirectory);
 
         Resource directory = Resource.builder()
                 .id(UuidCreator.getTimeOrderedEpoch())
@@ -81,14 +90,6 @@ public class ResourceMetadataService {
         }
     }
 
-    public Resource getResource(Long userId, String resourcePath) {
-
-        User user = userRepository.getReferenceById(userId);
-        ResourceType type = resourcePath.endsWith("/") ? ResourceType.DIRECTORY : ResourceType.FILE;
-
-        return findResource(userId, user.getUsername(), resourcePath, type);
-    }
-
     public List<Resource> getDirectoryContentsList(Long userId, String directoryPath) {
 
         User user = userRepository.getReferenceById(userId);
@@ -96,11 +97,8 @@ public class ResourceMetadataService {
         return resourceRepository.findAllByUserIdAndParentPath(userId, directoryPath);
     }
 
-    private Resource findResource(Long userId, String username, String resourcePath, ResourceType type) {
-
-        return resourceRepository.findByUserIdAndPath(userId, resourcePath)
-                .orElseThrow(() -> new ResourceNotFoundException(String
-                        .format("%s '%s' of user %s is not found", type, resourcePath, username)));
+    public List<Resource> getDirectorySubtree(Long userId, String directoryPath) {
+        return resourceRepository.findByUserIdAndPathStartingWith(userId, directoryPath);
     }
 
     private void requireResourceExists(Long userId, String username, String resourcePath, ResourceType type) {
@@ -160,7 +158,6 @@ public class ResourceMetadataService {
                         )
                 );
             }
-
             return resource;
         }
         return resourceRepository.save(directory);
