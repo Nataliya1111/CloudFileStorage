@@ -92,8 +92,7 @@ public class ResourceMetadataService {
 
     public List<Resource> getDirectoryContentsList(Long userId, String directoryPath) {
 
-        User user = userRepository.getReferenceById(userId);
-        requireResourceExists(userId, user.getUsername(), directoryPath, ResourceType.DIRECTORY);
+        requireResourceExists(userId, directoryPath);
         return resourceRepository.findAllByUserIdAndParentPath(userId, directoryPath);
     }
 
@@ -101,10 +100,14 @@ public class ResourceMetadataService {
         return resourceRepository.findByUserIdAndPathStartingWith(userId, directoryPath);
     }
 
-    private void requireResourceExists(Long userId, String username, String resourcePath, ResourceType type) {
+    public void deleteResources(List<Resource> resources) {
+        resourceRepository.deleteAllInBatch(resources);
+    }
+
+    public void requireResourceExists(Long userId, String resourcePath) {
         if (!resourceRepository.existsByUserIdAndPath(userId, resourcePath)) {
             throw new ResourceNotFoundException(String
-                    .format("%s '%s' of user %s is not found", type, resourcePath, username));
+                    .format("Resource '%s' of user with id '%s' is not found", resourcePath, userId));
         }
     }
 

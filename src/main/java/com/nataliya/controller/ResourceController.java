@@ -40,6 +40,14 @@ public class ResourceController {
         return fileSystemService.uploadFiles(user.getId(), pathRequestDto.path(), objects);
     }
 
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@AuthenticationPrincipal AuthenticatedUser user,
+                       @Valid ResourceRequestDto resourceRequestDto) {
+
+        fileSystemService.deleteResource(user.getId(), resourceRequestDto.path());
+    }
+
     @GetMapping("/download")
     public ResponseEntity<StreamingResponseBody> download(@AuthenticationPrincipal AuthenticatedUser user,
                                                           @Valid ResourceRequestDto resourceRequestDto) {

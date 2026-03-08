@@ -3,6 +3,8 @@ package com.nataliya.service;
 import com.nataliya.config.MinioProperties;
 import com.nataliya.exception.MinioStorageException;
 import io.minio.*;
+import io.minio.messages.DeleteError;
+import io.minio.messages.DeleteObject;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,6 +48,47 @@ public class MinioService {
                     .build());
         } catch (Exception e) {
             throw new MinioStorageException("Failed to download resource from MinIO storage", e);
+        }
+    }
+
+    public void deleteFiles(List<UUID> objectKeys) {
+
+        List<DeleteObject> objects = new ArrayList<>();
+
+        for (UUID objectKey : objectKeys) {
+            objects.add(new DeleteObject(objectKey.toString()));
+        }
+
+        Iterable<Result<DeleteError>> results =
+                minioClient.removeObjects(
+                        RemoveObjectsArgs.builder()
+                                .bucket(bucketName)
+                                .objects(objects)
+                                .build());
+
+        throwIfDeleteErrors(results);
+    }
+
+    private void throwIfDeleteErrors(Iterable<Result<DeleteError>> errorResults) {
+        List<String> errors = new ArrayList<>();
+
+        for (Result<DeleteError> result : errorResults) {
+            DeleteError error;
+
+            try {
+                error = result.get();
+            } catch (Exception e) {
+                throw new MinioStorageException("Failed to delete objects from MinIO storage", e);
+            }
+            errors.add(
+                    String.format("%s: (%s)", error.objectName(), error.message())
+            );
+        }
+
+        if (!errors.isEmpty()) {
+            throw new MinioStorageException(
+                    "Errors occurred while deleting objects: " + String.join(", ", errors)
+            );
         }
     }
 }

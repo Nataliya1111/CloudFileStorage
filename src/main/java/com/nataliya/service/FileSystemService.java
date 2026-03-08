@@ -2,10 +2,7 @@ package com.nataliya.service;
 
 import com.nataliya.dto.resource.DownloadResourceDto;
 import com.nataliya.dto.resource.ResourceResponseDto;
-import com.nataliya.exception.FileAlreadyExistsException;
-import com.nataliya.exception.FileStreamingException;
-import com.nataliya.exception.PartialUploadException;
-import com.nataliya.exception.ResourceConflictException;
+import com.nataliya.exception.*;
 import com.nataliya.mapper.ResourceMapper;
 import com.nataliya.model.ResourceType;
 import com.nataliya.model.entity.Resource;
@@ -85,6 +82,25 @@ public class FileSystemService {
             throw buildPartialUploadException(files.size(), failedFilePaths);
         }
         return resourceMapper.resourceListToDtoList(uploadedResources);
+    }
+
+    @Transactional
+    public void deleteResource(Long userId, String resourcePath) {
+
+        String normalizedPath = PathUtil.normalizePath(resourcePath);
+        resourceMetadataService.requireResourceExists(userId, resourcePath);
+
+        List<Resource> subtree = resourceMetadataService.getDirectorySubtree(userId, normalizedPath);
+
+        List<UUID> filesIds = subtree.stream()
+                .filter(resource -> resource.getResourceType() == ResourceType.FILE)
+                .map(Resource::getId)
+                .toList();
+
+        if (!filesIds.isEmpty()) {
+            minioService.deleteFiles(filesIds);
+        }
+        resourceMetadataService.deleteResources(subtree);
     }
 
     public DownloadResourceDto prepareDownload(Long userId, String resourcePath) {
