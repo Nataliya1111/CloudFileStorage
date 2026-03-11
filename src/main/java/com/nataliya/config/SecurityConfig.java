@@ -6,7 +6,7 @@ import com.nataliya.security.filter.JsonUsernamePasswordAuthenticationFilter;
 import com.nataliya.security.handler.HttpStatusLogoutSuccessHandler;
 import com.nataliya.security.handler.JsonAuthenticationFailureHandler;
 import com.nataliya.security.handler.JsonAuthenticationSuccessHandler;
-import com.nataliya.util.UserDtoValidator;
+import com.nataliya.validation.UserDtoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

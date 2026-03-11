@@ -1,4 +1,4 @@
-package com.nataliya.util;
+package com.nataliya.validation;
 
 import com.nataliya.dto.user.UserAuthenticationRequestDto;
 import jakarta.validation.Valid;
@@ -9,7 +9,7 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class UserDtoValidator {
 
-    public void validate (@Valid UserAuthenticationRequestDto userRequestDto) {
+    public void validate(@Valid UserAuthenticationRequestDto userRequestDto) {
 
     }
 }

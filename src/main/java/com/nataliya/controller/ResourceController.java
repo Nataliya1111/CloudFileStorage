@@ -1,9 +1,6 @@
 package com.nataliya.controller;
 
-import com.nataliya.dto.resource.DownloadResourceDto;
-import com.nataliya.dto.resource.PathRequestDto;
-import com.nataliya.dto.resource.ResourceRequestDto;
-import com.nataliya.dto.resource.ResourceResponseDto;
+import com.nataliya.dto.resource.*;
 import com.nataliya.security.model.AuthenticatedUser;
 import com.nataliya.service.FileSystemService;
 import jakarta.validation.Valid;
@@ -64,5 +61,12 @@ public class ResourceController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString())
                 .body(download.body());
+    }
+
+    @GetMapping("/move")
+    public ResourceResponseDto move(@AuthenticationPrincipal AuthenticatedUser user,
+                                    @Valid MovingResourceRequestDto requestDto) {
+
+        return fileSystemService.move(user.getId(), requestDto.from(), requestDto.to());
     }
 }

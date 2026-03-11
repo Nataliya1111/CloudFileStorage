@@ -34,6 +34,10 @@ public final class PathUtil {
         return formatted.isEmpty() ? "/" : formatted;
     }
 
+    public static boolean isDirectory(String path) {
+        return path.endsWith("/");
+    }
+
     public static String extractResourceName(String path, boolean requireTrailingSlash) {
         path = formatPath(path, false, false);
         int lastSlash = path.lastIndexOf('/');
@@ -44,7 +48,7 @@ public final class PathUtil {
     public static String extractParentDirectoryPath(String path) {
         path = formatPath(path, false, false);
         int lastSlash = path.lastIndexOf('/');
-        return path.substring(0, lastSlash + 1);
+        return lastSlash > 0 ? path.substring(0, lastSlash + 1) : "/";
     }
 
     public static String extractRelativePath(String fullPath, String resourcePath) {

@@ -2,7 +2,7 @@ package com.nataliya.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nataliya.dto.user.UserAuthenticationRequestDto;
-import com.nataliya.util.UserDtoValidator;
+import com.nataliya.validation.UserDtoValidator;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;

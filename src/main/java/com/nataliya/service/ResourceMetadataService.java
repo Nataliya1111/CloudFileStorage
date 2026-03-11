@@ -100,14 +100,30 @@ public class ResourceMetadataService {
         return resourceRepository.findByUserIdAndPathStartingWith(userId, directoryPath);
     }
 
+    public void deleteResource(Resource resource){
+        resourceRepository.delete(resource);
+    }
+
     public void deleteResources(List<Resource> resources) {
         resourceRepository.deleteAllInBatch(resources);
+    }
+
+    public boolean exists(Long userId, String resourcePath){
+        return resourceRepository.existsByUserIdAndPath(userId, resourcePath);
     }
 
     public void requireResourceExists(Long userId, String resourcePath) {
         if (!resourceRepository.existsByUserIdAndPath(userId, resourcePath)) {
             throw new ResourceNotFoundException(String
                     .format("Resource '%s' of user with id '%s' is not found", resourcePath, userId));
+        }
+    }
+
+    public void requireFileNotExists(Long userId, String resourcePath) {
+        if (resourceRepository.existsByUserIdAndPath(userId, resourcePath)) {
+            String message = String
+                    .format("File '%s' of user with userId=%d already exists", resourcePath, userId);
+            throw new FileAlreadyExistsException(message, resourcePath);
         }
     }
 

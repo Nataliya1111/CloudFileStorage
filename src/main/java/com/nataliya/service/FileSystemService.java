@@ -88,7 +88,7 @@ public class FileSystemService {
     public void deleteResource(Long userId, String resourcePath) {
 
         String normalizedPath = PathUtil.normalizePath(resourcePath);
-        resourceMetadataService.requireResourceExists(userId, resourcePath);
+        resourceMetadataService.requireResourceExists(userId, normalizedPath);
 
         List<Resource> subtree = resourceMetadataService.getDirectorySubtree(userId, normalizedPath);
 
@@ -101,6 +101,107 @@ public class FileSystemService {
             minioService.deleteFiles(filesIds);
         }
         resourceMetadataService.deleteResources(subtree);
+    }
+
+    @Transactional
+    public ResourceResponseDto move(Long userId, String fromPath, String toPath) {
+
+        String sourcePath = PathUtil.normalizePath(fromPath);
+        String destinationPath = PathUtil.normalizePath(toPath);
+
+        resourceMetadataService.requireResourceExists(userId, sourcePath);
+
+        Resource result;
+
+        if (resourceNameChanged(sourcePath, destinationPath)) {
+            result = renameSubtree(userId, sourcePath, destinationPath);
+        } else {
+            result = moveSubtree(userId, sourcePath, destinationPath);
+        }
+
+        return resourceMapper.resourceToResourceDto(result);
+    }
+
+    private boolean resourceNameChanged(String sourcePath, String destinationPath) {
+
+        String sourceName = PathUtil.extractResourceName(sourcePath, false);
+        String newName = PathUtil.extractResourceName(destinationPath, false);
+
+        return !sourceName.equals(newName);
+    }
+
+    private Resource renameSubtree(Long userId, String sourcePath, String destinationPath) {
+
+        String newName = PathUtil.extractResourceName(destinationPath, false);
+        Resource resource = resourceMetadataService.getResource(userId, sourcePath);
+
+        List<Resource> subtree = resourceMetadataService.getDirectorySubtree(userId, sourcePath);
+        subtree.sort(Comparator.comparingInt(r -> r.getPath().length()));
+
+        for (Resource node : subtree) {
+            String newPath = buildRenamedPath(node, sourcePath, destinationPath);
+            node.setPath(newPath);
+        }
+
+        resource.setResourceName(newName);
+        return resource;
+    }
+
+    private String buildRenamedPath(Resource resource, String sourcePath, String destinationPath) {
+
+        String suffix = resource.getPath().substring(sourcePath.length());
+        return destinationPath + suffix;
+    }
+
+    private Resource moveSubtree(Long userId, String sourceFullPath, String destinationPath) {
+
+        String destinationParentPath = PathUtil.extractParentDirectoryPath(destinationPath);
+        Resource destinationParent = resourceMetadataService.getResource(userId, destinationParentPath);
+
+        List<Resource> subtree = resourceMetadataService.getDirectorySubtree(userId, sourceFullPath);
+        subtree.sort(Comparator.comparingInt(r -> r.getPath().length()));
+
+        int sourcePathLength = sourceFullPath.length();
+
+        for (Resource node : subtree) {
+            String newPath = destinationPath + node.getPath().substring(sourcePathLength);
+
+            if (node.getResourceType() == ResourceType.FILE) {
+                handleFileMove(userId, node, newPath, destinationPath, destinationParent);
+            } else {
+                handleDirectoryMove(userId, node, newPath, destinationPath, destinationParent);
+            }
+        }
+        return resourceMetadataService.getResource(userId, destinationPath);
+    }
+
+    private void handleFileMove(Long userId, Resource resource, String newPath, String destinationPath, Resource destinationParent) {
+
+        resourceMetadataService.requireFileNotExists(userId, newPath);
+        resource.setPath(newPath);
+
+        if (newPath.equals(destinationPath)) {
+            resource.setParent(destinationParent);
+        }
+    }
+
+    private void handleDirectoryMove(Long userId, Resource resource, String newPath, String destinationPath, Resource destinationParent) {
+
+        if (resourceMetadataService.exists(userId, newPath)) {
+            Resource newParent = resourceMetadataService.getResource(userId, newPath);
+
+            for (Resource child : resource.getChildren()) {
+                child.setParent(newParent);
+            }
+            resourceMetadataService.deleteResource(resource);
+
+        } else {
+            resource.setPath(newPath);
+
+            if (newPath.equals(destinationPath)) {
+                resource.setParent(destinationParent);
+            }
+        }
     }
 
     public DownloadResourceDto prepareDownload(Long userId, String resourcePath) {
