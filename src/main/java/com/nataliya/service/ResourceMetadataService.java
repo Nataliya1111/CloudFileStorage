@@ -127,6 +127,10 @@ public class ResourceMetadataService {
         }
     }
 
+    public List<Resource> getSearchResult(Long userId, String query){
+        return resourceRepository.searchByResourceName(userId, query);
+    }
+
     private Resource createDirectoryHierarchyMetadata(User user, String relativePathToFile, Resource targetDirectory) {
         if (relativePathToFile == null || relativePathToFile.isBlank()) {
             return targetDirectory;

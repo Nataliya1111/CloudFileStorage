@@ -84,6 +84,11 @@ public class FileSystemService {
         return resourceMapper.resourceListToDtoList(uploadedResources);
     }
 
+    public List<ResourceResponseDto> search(Long userId, String query) {
+        List<Resource> searchResult = resourceMetadataService.getSearchResult(userId, query);
+        return resourceMapper.resourceListToDtoList(searchResult);
+    }
+
     @Transactional
     public void deleteResource(Long userId, String resourcePath) {
 
@@ -167,15 +172,15 @@ public class FileSystemService {
             String newPath = destinationPath + node.getPath().substring(sourcePathLength);
 
             if (node.getResourceType() == ResourceType.FILE) {
-                handleFileMove(userId, node, newPath, destinationPath, destinationParent);
+                moveFile(userId, node, newPath, destinationPath, destinationParent);
             } else {
-                handleDirectoryMove(userId, node, newPath, destinationPath, destinationParent);
+                moveDirectory(userId, node, newPath, destinationPath, destinationParent);
             }
         }
         return resourceMetadataService.getResource(userId, destinationPath);
     }
 
-    private void handleFileMove(Long userId, Resource resource, String newPath, String destinationPath, Resource destinationParent) {
+    private void moveFile(Long userId, Resource resource, String newPath, String destinationPath, Resource destinationParent) {
 
         resourceMetadataService.requireFileNotExists(userId, newPath);
         resource.setPath(newPath);
@@ -185,7 +190,7 @@ public class FileSystemService {
         }
     }
 
-    private void handleDirectoryMove(Long userId, Resource resource, String newPath, String destinationPath, Resource destinationParent) {
+    private void moveDirectory(Long userId, Resource resource, String newPath, String destinationPath, Resource destinationParent) {
 
         if (resourceMetadataService.exists(userId, newPath)) {
             Resource newParent = resourceMetadataService.getResource(userId, newPath);
@@ -228,6 +233,7 @@ public class FileSystemService {
     }
 
     private void writeFileToStream(Long userId, String resourcePath, OutputStream outputStream) {
+
         Resource file = resourceMetadataService.getResource(userId, resourcePath);
         ensureIsFile(file);
         try (InputStream inputStream = minioService.getFileStream(file.getId())) {

@@ -4,9 +4,11 @@ import com.nataliya.dto.resource.*;
 import com.nataliya.security.model.AuthenticatedUser;
 import com.nataliya.service.FileSystemService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
@@ -17,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/resource")
 @RequiredArgsConstructor
+@Validated
 public class ResourceController {
 
     private final FileSystemService fileSystemService;
@@ -68,5 +71,12 @@ public class ResourceController {
                                     @Valid MovingResourceRequestDto requestDto) {
 
         return fileSystemService.move(user.getId(), requestDto.from(), requestDto.to());
+    }
+
+    @GetMapping("/search")
+    public List<ResourceResponseDto> search(@AuthenticationPrincipal AuthenticatedUser user,
+                                            @RequestParam @NotBlank String query) {
+
+        return fileSystemService.search(user.getId(), query);
     }
 }
