@@ -80,7 +80,6 @@ public class FileSystemService {
     }
 
     public DownloadResourceDto download(Long userId, String resourcePath) {
-
         return downloadService.prepareDownload(userId, resourcePath);
     }
 
@@ -102,9 +101,7 @@ public class FileSystemService {
                 .map(Resource::getId)
                 .toList();
 
-        if (!filesIds.isEmpty()) {
-            minioService.deleteFiles(filesIds);
-        }
+        minioService.deleteFiles(filesIds);
         resourceMetadataService.deleteResources(subtree);
     }
 

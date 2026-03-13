@@ -53,6 +53,10 @@ public class MinioService {
 
     public void deleteFiles(List<UUID> objectKeys) {
 
+        if (objectKeys.isEmpty()){
+            return;
+        }
+
         List<DeleteObject> objects = new ArrayList<>();
 
         for (UUID objectKey : objectKeys) {

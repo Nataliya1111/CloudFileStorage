@@ -67,26 +67,14 @@ public class ResourceMetadataService {
 
     public Resource createEmptyDirectory(Long userId, String directoryPath) {
 
-        User user = userRepository.getReferenceById(userId);
-        String directoryName = PathUtil.extractResourceName(directoryPath, false);
-        String relativePathToDirectory = PathUtil.extractParentDirectoryPath(directoryPath);
-        Resource parent = getResource(userId, relativePathToDirectory);
-
-        Resource directory = Resource.builder()
-                .id(UuidCreator.getTimeOrderedEpoch())
-                .user(user)
-                .resourceName(directoryName)
-                .parent(parent)
-                .path(directoryPath)
-                .resourceType(ResourceType.DIRECTORY)
-                .build();
+        Resource directory = buildResource(userId, directoryPath);
 
         try {
             resourceRepository.saveAndFlush(directory);
             return directory;
         } catch (DataIntegrityViolationException e) {
             throw new ResourceConflictException(String
-                    .format("Directory '%s' of user %s already exists", directoryPath, user.getUsername()));
+                    .format("Directory '%s' of user with id '%d' already exists", directoryPath, userId));
         }
     }
 
@@ -100,7 +88,7 @@ public class ResourceMetadataService {
         return resourceRepository.findByUserIdAndPathStartingWith(userId, directoryPath);
     }
 
-    public void deleteResource(Resource resource){
+    public void deleteResource(Resource resource) {
         resourceRepository.delete(resource);
     }
 
@@ -108,7 +96,7 @@ public class ResourceMetadataService {
         resourceRepository.deleteAllInBatch(resources);
     }
 
-    public boolean exists(Long userId, String resourcePath){
+    public boolean exists(Long userId, String resourcePath) {
         return resourceRepository.existsByUserIdAndPath(userId, resourcePath);
     }
 
@@ -127,8 +115,25 @@ public class ResourceMetadataService {
         }
     }
 
-    public List<Resource> getSearchResult(Long userId, String query){
+    public List<Resource> getSearchResult(Long userId, String query) {
         return resourceRepository.searchByResourceName(userId, query);
+    }
+
+    private Resource buildResource(Long userId, String directoryPath) {
+
+        User user = userRepository.getReferenceById(userId);
+        String directoryName = PathUtil.extractResourceName(directoryPath, false);
+        String relativePathToDirectory = PathUtil.extractParentDirectoryPath(directoryPath);
+        Resource parent = getResource(userId, relativePathToDirectory);
+
+        return Resource.builder()
+                .id(UuidCreator.getTimeOrderedEpoch())
+                .user(user)
+                .resourceName(directoryName)
+                .parent(parent)
+                .path(directoryPath)
+                .resourceType(ResourceType.DIRECTORY)
+                .build();
     }
 
     private Resource createDirectoryHierarchyMetadata(User user, String relativePathToFile, Resource targetDirectory) {
