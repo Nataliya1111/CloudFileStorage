@@ -52,7 +52,7 @@ public class ResourceController {
     public ResponseEntity<StreamingResponseBody> download(@AuthenticationPrincipal AuthenticatedUser user,
                                                           @Valid ResourceRequestDto resourceRequestDto) {
 
-        DownloadResourceDto download = fileSystemService.prepareDownload(user.getId(), resourceRequestDto.path());
+        DownloadResourceDto download = fileSystemService.download(user.getId(), resourceRequestDto.path());
 
         ContentDisposition disposition =
                 ContentDisposition.attachment()
