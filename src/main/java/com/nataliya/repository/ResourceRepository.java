@@ -29,4 +29,19 @@ public interface ResourceRepository extends JpaRepository<Resource, UUID> {
     List<Resource> searchByResourceName(Long userId, String query);
 
     boolean existsByUserIdAndPath(Long userId, String path);
+
+    @Query("""
+            SELECT COALESCE(SUM(r.size),0)
+            FROM Resource r
+            WHERE r.user.id = :userId
+            AND r.resourceType = com.nataliya.model.ResourceType.FILE
+            """)
+    long getUserStorageUsage(Long userId);
+
+    @Query("""
+            SELECT COALESCE(SUM(r.size),0)
+            FROM Resource r
+            WHERE r.resourceType = com.nataliya.model.ResourceType.FILE
+            """)
+    long getTotalStorageUsage();
 }

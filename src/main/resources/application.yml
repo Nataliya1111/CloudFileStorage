@@ -1,6 +1,10 @@
 spring:
   profiles:
     active: dev
+  servlet:
+    multipart:
+      max-file-size: ${SPRING_MULTIPART_MAX_FILE_SIZE:10MB}
+      max-request-size: ${SPRING_MULTIPART_MAX_REQUEST_SIZE:15MB}
 
   datasource:
     url: jdbc:postgresql://localhost:5433/testdatabase
@@ -31,6 +35,13 @@ minio:
   bucket-name: user-files
   user-root-directory: user-%d-files/
 
+server:
+  tomcat:
+    max-swallow-size: -1
+
 app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost}
+  max-storage:
+    user: ${MAX_USER_STORAGE:20MB}
+    server: ${MAX_SERVER_STORAGE:800MB}

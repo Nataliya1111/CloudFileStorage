@@ -115,6 +115,14 @@ public class ResourceMetadataService {
         }
     }
 
+    public long getUserStorageUsage(Long userId) {
+        return resourceRepository.getUserStorageUsage(userId);
+    }
+
+    public long getTotalStorageUsage() {
+        return resourceRepository.getTotalStorageUsage();
+    }
+
     public List<Resource> getSearchResult(Long userId, String query) {
         return resourceRepository.searchByResourceName(userId, query);
     }
@@ -191,9 +199,18 @@ public class ResourceMetadataService {
         return resourceRepository.save(directory);
     }
 
-    private Resource createFileMetadataEntry(User user, Resource parent, String fileName, long size) throws FileAlreadyExistsException {
+    private Resource createFileMetadataEntry(User user, Resource parent, String fileName, long size)
+            throws FileAlreadyExistsException {
+
+        if (parent == null) {
+            throw new ResourceNotFoundException(
+                    String.format("Parent directory for file '%s' not found", fileName)
+            );
+        }
+
         UUID fileId = UuidCreator.getTimeOrderedEpoch();
-        String filePath = parent != null ? parent.getPath() + fileName : fileName;
+
+        String filePath = parent.getPath().equals("/") ? fileName : parent.getPath() + fileName;
 
         Resource file = Resource.builder()
                 .id(fileId)

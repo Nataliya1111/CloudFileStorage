@@ -4,6 +4,7 @@ import com.nataliya.dto.error.ErrorResponseDto;
 import com.nataliya.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.*;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.ArrayList;
@@ -29,7 +31,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
-                .contentType(MediaType.APPLICATION_JSON)
                 .body(new ErrorResponseDto(ex.getMessage()));
     }
 
@@ -61,7 +62,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST) //400
-                .contentType(MediaType.APPLICATION_JSON)
                 .body(new ErrorResponseDto(message));
     }
 
@@ -72,7 +72,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .contentType(MediaType.APPLICATION_JSON)
                 .body(new ErrorResponseDto(ex.getMessage()));
     }
 
@@ -87,7 +86,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND) //404
-                .contentType(MediaType.APPLICATION_JSON)
                 .body(new ErrorResponseDto(ex.getMessage()));
     }
 
@@ -102,7 +100,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.CONFLICT) //409
-                .contentType(MediaType.APPLICATION_JSON)
                 .body(new ErrorResponseDto(ex.getMessage()));
     }
 
@@ -111,8 +108,31 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.CONFLICT) //409
-                .contentType(MediaType.APPLICATION_JSON)
                 .body(new ErrorResponseDto(ex.getMessage()));
+    }
+
+    @ExceptionHandler(StorageLimitExceededException.class)
+    public ResponseEntity<ErrorResponseDto> handleException(StorageLimitExceededException ex) {
+
+        log.warn("Attempt to upload files out of user or server memory limits", ex);
+
+        return ResponseEntity
+                .status(HttpStatus.PAYLOAD_TOO_LARGE) //413
+                .body(new ErrorResponseDto(ex.getMessage()));
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMaxUploadSizeExceededException(
+            @NotNull MaxUploadSizeExceededException ex,
+            @NotNull HttpHeaders headers,
+            @NotNull HttpStatusCode status,
+            @NotNull WebRequest request) {
+
+        log.warn("Attempt to upload too large file", ex);
+
+        return ResponseEntity
+                .status(HttpStatus.PAYLOAD_TOO_LARGE) //413
+                .body(new ErrorResponseDto("File too large"));
     }
 
     @ExceptionHandler(Exception.class)
