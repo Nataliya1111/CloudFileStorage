@@ -45,3 +45,8 @@ app:
   max-storage:
     user: ${MAX_USER_STORAGE:20MB}
     server: ${MAX_SERVER_STORAGE:800MB}
+
+# swagger-ui custom path
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

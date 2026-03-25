@@ -1,5 +1,6 @@
 package com.nataliya.dto.user;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -14,6 +15,7 @@ public record UserRegistrationRequestDto(
                 regexp = "^[a-zA-Z0-9]+[a-zA-Z_0-9]*[a-zA-Z0-9]+$",
                 message = "Username can contain only latin letters, digits or underscores (not the first or the last character)"
         )
+        @Schema(example = "User1")
         String username,
 
         @NotBlank(message = "Password must not be empty")
@@ -25,6 +27,7 @@ public record UserRegistrationRequestDto(
                 regexp = "^[a-zA-Z0-9!@#$%^&*(),.?\":{}|<>\\\\/`~+=-_';]*$",
                 message = "Password contains invalid characters. Only Latin letters, digits and common symbols are allowed"
         )
+        @Schema(example = "MyPassword")
         String password
 ) {
 }

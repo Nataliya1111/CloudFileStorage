@@ -3,6 +3,8 @@ package com.nataliya.handler;
 import com.nataliya.dto.error.ErrorResponseDto;
 import com.nataliya.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.*;
@@ -59,6 +61,26 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.info("Validation failed for {}: {}",
                 request.getDescription(false),
                 message);
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST) //400
+                .body(new ErrorResponseDto(message));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponseDto> handleException(ConstraintViolationException ex, HttpServletRequest request) {
+
+        log.info("Validation failed at [{} {}]: {}",
+                request.getMethod(),
+                request.getRequestURI(),
+                ex.getMessage(),
+                ex);
+
+        String message = ex.getConstraintViolations()
+                .stream()
+                .map(ConstraintViolation::getMessage)
+                .findFirst()
+                .orElse("Validation error");
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST) //400

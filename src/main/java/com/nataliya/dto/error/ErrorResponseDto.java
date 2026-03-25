@@ -1,4 +1,10 @@
 package com.nataliya.dto.error;
 
-public record ErrorResponseDto(String message) {
+import io.swagger.v3.oas.annotations.media.Schema;
+
+public record ErrorResponseDto(
+
+        @Schema(example = "Unexpected error")
+        String message
+) {
 }
