@@ -45,14 +45,6 @@ databaseChangeLog:
                     nullable: true
 
         - createIndex:
-            indexName: idx_resources_user_name
-            tableName: resources
-            columns:
-              - column:
-                  name: user_id
-              - column:
-                  name: resource_name
-        - createIndex:
             indexName: idx_resources_user_parent
             tableName: resources
             columns:
@@ -78,6 +70,14 @@ databaseChangeLog:
                   name: parent_id
               - column:
                   name: resource_name
+        - createIndex:
+            indexName: idx_resources_user_type
+            tableName: resources
+            columns:
+              - column:
+                  name: user_id
+              - column:
+                  name: resource_type
 
         - addForeignKeyConstraint:
             baseTableName: resources

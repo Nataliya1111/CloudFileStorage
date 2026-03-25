@@ -80,8 +80,12 @@ public class ResourceMetadataService {
 
     public List<Resource> getDirectoryContentsList(Long userId, String directoryPath) {
 
-        requireResourceExists(userId, directoryPath);
-        return resourceRepository.findAllByUserIdAndParentPath(userId, directoryPath);
+        UUID parentId = resourceRepository.findByUserIdAndPath(userId, directoryPath)
+                .orElseThrow(() -> new ResourceNotFoundException(String
+                        .format("Directory '%s' of user with id '%d' is not found", directoryPath, userId)))
+                .getId();
+
+        return resourceRepository.findAllByUserIdAndParentId(userId, parentId);
     }
 
     public List<Resource> getDirectorySubtree(Long userId, String directoryPath) {
