@@ -113,9 +113,8 @@ public class ResourceMetadataService {
 
     public void requireFileNotExists(Long userId, String resourcePath) {
         if (resourceRepository.existsByUserIdAndPath(userId, resourcePath)) {
-            String message = String
-                    .format("File '%s' of user with userId=%d already exists", resourcePath, userId);
-            throw new FileAlreadyExistsException(message, resourcePath);
+            throw new ResourceConflictException(String
+                    .format("File '%s' already exists", resourcePath));
         }
     }
 

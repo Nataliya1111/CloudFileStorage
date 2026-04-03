@@ -134,6 +134,8 @@ public class FileSystemService {
 
     private Resource renameSubtree(Long userId, String sourcePath, String destinationPath) {
 
+        resourceMetadataService.requireFileNotExists(userId, destinationPath);
+
         String newName = PathUtil.extractResourceName(destinationPath, false);
         Resource resource = resourceMetadataService.getResource(userId, sourcePath);
 
