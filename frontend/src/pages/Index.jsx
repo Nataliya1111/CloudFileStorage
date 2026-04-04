@@ -3,6 +3,7 @@ import {FilePageButton} from "../components/FilePageButton/FilePageButton.jsx";
 import {useAuthContext} from "../context/Auth/AuthContext.jsx";
 import Typography from "@mui/material/Typography";
 import {useNavigate} from "react-router-dom";
+import Link from "@mui/material/Link";
 
 export default function Index() {
 
@@ -36,16 +37,22 @@ export default function Index() {
 
                 <Divider style={{marginTop: 20, marginBottom: 20, marginRight: 20, marginLeft: 20}}/>
 
-                <Box >
-                    <Typography  variant="body1" className="col-lg-8 themed-grid-col text-center">
-                        Подробнее с функционалом можно познакомиться на странице
-                        <Typography fontWeight="bold" onClick={() => navigate("/help")}
-                        sx={{
-                            cursor: "pointer",
-                            color: 'info.main',
-                        }}
+                <Box>
+                    <Typography
+                        variant="body1"
+                        className="col-lg-8 themed-grid-col text-center"
+                    >
+                        Подробнее с функционалом можно познакомиться на странице{" "}
+
+                        <Link
+                            href={window.APP_CONFIG.githubLink}
+                            target="_blank"
+                            rel="noopener"
+                            sx={{ fontWeight: "bold" }}
                         >
-                            помощи</Typography>
+                            помощи
+                        </Link>
+
                     </Typography>
                 </Box>
 
