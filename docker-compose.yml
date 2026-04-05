@@ -13,6 +13,8 @@ services:
         condition: service_started
     env_file:
       - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
     ports:
       - "8080:8080"
 
