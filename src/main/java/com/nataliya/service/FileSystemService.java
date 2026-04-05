@@ -134,7 +134,7 @@ public class FileSystemService {
 
     private Resource renameSubtree(Long userId, String sourcePath, String destinationPath) {
 
-        resourceMetadataService.requireFileNotExists(userId, destinationPath);
+        resourceMetadataService.requireResourceNotExists(userId, destinationPath);
 
         String newName = PathUtil.extractResourceName(destinationPath, false);
         Resource resource = resourceMetadataService.getResource(userId, sourcePath);
@@ -181,7 +181,7 @@ public class FileSystemService {
 
     private void moveFile(Long userId, Resource resource, String newPath, String destinationPath, Resource destinationParent) {
 
-        resourceMetadataService.requireFileNotExists(userId, newPath);
+        resourceMetadataService.requireResourceNotExists(userId, newPath);
         resource.setPath(newPath);
 
         if (newPath.equals(destinationPath)) {

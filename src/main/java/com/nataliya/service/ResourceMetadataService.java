@@ -111,10 +111,12 @@ public class ResourceMetadataService {
         }
     }
 
-    public void requireFileNotExists(Long userId, String resourcePath) {
-        if (resourceRepository.existsByUserIdAndPath(userId, resourcePath)) {
+    public void requireResourceNotExists(Long userId, String resourcePath) {
+        resourcePath = PathUtil.formatPath(resourcePath, false, false);
+        if (resourceRepository.existsByUserIdAndPath(userId, resourcePath) ||
+            resourceRepository.existsByUserIdAndPath(userId, resourcePath + "/")) {
             throw new ResourceConflictException(String
-                    .format("File '%s' already exists", resourcePath));
+                    .format("Resource '%s' already exists", resourcePath));
         }
     }
 
