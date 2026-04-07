@@ -34,6 +34,7 @@ minio:
 server:
   tomcat:
     max-swallow-size: -1
+    max-part-count: ${TOMCAT_MAX_PART_COUNT:100}
 
 app:
   cors:

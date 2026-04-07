@@ -6,7 +6,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.impl.FileCountLimitExceededException;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.NestedExceptionUtils;
 import org.springframework.http.*;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.ArrayList;
@@ -25,6 +29,9 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @Value("${server.tomcat.max-part-count}")
+    private int maxPartCount;
 
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<ErrorResponseDto> handleException(UserAlreadyExistsException ex) {
@@ -141,6 +148,24 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.PAYLOAD_TOO_LARGE) //413
                 .body(new ErrorResponseDto(ex.getMessage()));
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<ErrorResponseDto> handleException(MultipartException ex) {
+
+        Throwable root = NestedExceptionUtils.getMostSpecificCause(ex);
+
+        if (root instanceof FileCountLimitExceededException) {
+            String message = "Too many files uploaded. Maximum allowed is " + maxPartCount;
+
+            log.warn(message, ex);
+
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST) //400
+                    .body(new ErrorResponseDto(message));
+        }
+
+        throw ex;
     }
 
     @Override
