@@ -1,9 +1,9 @@
 package com.nataliya.controller;
 
 import com.nataliya.controller.openapi.DirectoryOpenApi;
-import com.nataliya.dto.resource.ResourceRequestDto;
-import com.nataliya.dto.resource.PathRequestDto;
-import com.nataliya.dto.resource.ResourceResponseDto;
+import com.nataliya.dto.request.resource.ResourceRequestDto;
+import com.nataliya.dto.request.resource.PathRequestDto;
+import com.nataliya.dto.response.resource.ResourceResponseDto;
 import com.nataliya.security.model.AuthenticatedUser;
 import com.nataliya.service.FileSystemService;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,10 @@
 package com.nataliya.controller;
 
 import com.nataliya.controller.openapi.ResourceOpenApi;
-import com.nataliya.dto.resource.*;
+import com.nataliya.dto.DownloadResourceDto;
+import com.nataliya.dto.request.resource.MovingResourceRequestDto;
+import com.nataliya.dto.request.resource.ResourceRequestDto;
+import com.nataliya.dto.response.resource.ResourceResponseDto;
 import com.nataliya.security.model.AuthenticatedUser;
 import com.nataliya.service.FileSystemService;
 import lombok.RequiredArgsConstructor;

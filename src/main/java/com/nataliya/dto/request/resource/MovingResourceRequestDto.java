@@ -1,4 +1,4 @@
-package com.nataliya.dto.resource;
+package com.nataliya.dto.request.resource;
 
 import com.nataliya.validation.ValidMovePath;
 import io.swagger.v3.oas.annotations.media.Schema;

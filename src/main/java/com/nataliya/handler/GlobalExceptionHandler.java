@@ -1,6 +1,6 @@
 package com.nataliya.handler;
 
-import com.nataliya.dto.error.ErrorResponseDto;
+import com.nataliya.dto.response.error.ErrorResponseDto;
 import com.nataliya.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;

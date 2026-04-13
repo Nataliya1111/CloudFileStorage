@@ -1,4 +1,4 @@
-package com.nataliya.dto.error;
+package com.nataliya.dto.response.error;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

@@ -1,6 +1,6 @@
 package com.nataliya.config;
 
-import com.nataliya.dto.user.UserAuthenticationRequestDto;
+import com.nataliya.dto.request.user.UserAuthenticationRequestDto;
 import io.swagger.v3.core.converter.ModelConverters;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;

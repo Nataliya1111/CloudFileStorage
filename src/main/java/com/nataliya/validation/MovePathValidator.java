@@ -1,6 +1,6 @@
 package com.nataliya.validation;
 
-import com.nataliya.dto.resource.MovingResourceRequestDto;
+import com.nataliya.dto.request.resource.MovingResourceRequestDto;
 import com.nataliya.model.ResourceType;
 import com.nataliya.util.PathUtil;
 import jakarta.validation.ConstraintValidator;

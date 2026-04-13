@@ -1,9 +1,9 @@
 package com.nataliya.controller.openapi;
 
-import com.nataliya.dto.error.ErrorResponseDto;
-import com.nataliya.dto.resource.MovingResourceRequestDto;
-import com.nataliya.dto.resource.ResourceRequestDto;
-import com.nataliya.dto.resource.ResourceResponseDto;
+import com.nataliya.dto.response.error.ErrorResponseDto;
+import com.nataliya.dto.request.resource.MovingResourceRequestDto;
+import com.nataliya.dto.request.resource.ResourceRequestDto;
+import com.nataliya.dto.response.resource.ResourceResponseDto;
 import com.nataliya.openapi.annotations.BadRequestAndUnauthorizedResponses;
 import com.nataliya.openapi.annotations.CommonStorageErrorResponses;
 import com.nataliya.openapi.annotations.InternalServerErrorResponse;

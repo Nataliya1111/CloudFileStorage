@@ -1,7 +1,7 @@
 package com.nataliya.service;
 
-import com.nataliya.dto.resource.DownloadResourceDto;
-import com.nataliya.dto.resource.ResourceResponseDto;
+import com.nataliya.dto.DownloadResourceDto;
+import com.nataliya.dto.response.resource.ResourceResponseDto;
 import com.nataliya.exception.*;
 import com.nataliya.mapper.ResourceMapper;
 import com.nataliya.model.ResourceType;

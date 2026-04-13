@@ -1,4 +1,4 @@
-package com.nataliya.dto.resource;
+package com.nataliya.dto;
 
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 

@@ -1,8 +1,8 @@
 package com.nataliya.controller;
 
 import com.nataliya.controller.openapi.AuthOpenApi;
-import com.nataliya.dto.user.UserRegistrationRequestDto;
-import com.nataliya.dto.user.UsernameResponseDto;
+import com.nataliya.dto.request.user.UserRegistrationRequestDto;
+import com.nataliya.dto.response.user.UsernameResponseDto;
 import com.nataliya.security.service.LoginService;
 import com.nataliya.service.RegistrationService;
 import jakarta.servlet.http.HttpServletRequest;

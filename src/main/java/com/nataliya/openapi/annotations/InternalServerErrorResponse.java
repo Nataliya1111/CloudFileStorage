@@ -1,7 +1,7 @@
 package com.nataliya.openapi.annotations;
 
 
-import com.nataliya.dto.error.ErrorResponseDto;
+import com.nataliya.dto.response.error.ErrorResponseDto;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

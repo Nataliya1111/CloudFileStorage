@@ -1,4 +1,4 @@
-package com.nataliya.dto.resource;
+package com.nataliya.dto.response.resource;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.nataliya.model.ResourceType;
@@ -27,12 +27,4 @@ public record ResourceResponseDto(
         )
         ResourceType type
 ) {
-
-    public ResourceResponseDto(String path, String name, Long size) {
-        this(path, name, size, ResourceType.FILE);
-    }
-
-    public ResourceResponseDto(String path, String name) {
-        this(path, name, null, ResourceType.DIRECTORY);
-    }
 }

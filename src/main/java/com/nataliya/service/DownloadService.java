@@ -1,6 +1,6 @@
 package com.nataliya.service;
 
-import com.nataliya.dto.resource.DownloadResourceDto;
+import com.nataliya.dto.DownloadResourceDto;
 import com.nataliya.exception.FileStreamingException;
 import com.nataliya.model.ResourceType;
 import com.nataliya.model.entity.Resource;

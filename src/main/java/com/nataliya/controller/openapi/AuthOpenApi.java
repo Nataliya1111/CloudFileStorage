@@ -1,8 +1,8 @@
 package com.nataliya.controller.openapi;
 
-import com.nataliya.dto.error.ErrorResponseDto;
-import com.nataliya.dto.user.UserRegistrationRequestDto;
-import com.nataliya.dto.user.UsernameResponseDto;
+import com.nataliya.dto.response.error.ErrorResponseDto;
+import com.nataliya.dto.request.user.UserRegistrationRequestDto;
+import com.nataliya.dto.response.user.UsernameResponseDto;
 import com.nataliya.openapi.annotations.InternalServerErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

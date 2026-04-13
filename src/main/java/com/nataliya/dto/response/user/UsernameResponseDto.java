@@ -1,4 +1,4 @@
-package com.nataliya.dto.user;
+package com.nataliya.dto.response.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

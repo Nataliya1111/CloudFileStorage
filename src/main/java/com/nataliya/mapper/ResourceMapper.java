@@ -1,6 +1,6 @@
 package com.nataliya.mapper;
 
-import com.nataliya.dto.resource.ResourceResponseDto;
+import com.nataliya.dto.response.resource.ResourceResponseDto;
 import com.nataliya.model.ResourceType;
 import com.nataliya.model.entity.Resource;
 import com.nataliya.util.PathUtil;

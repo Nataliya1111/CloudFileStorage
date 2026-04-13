@@ -1,7 +1,7 @@
 package com.nataliya.controller;
 
 import com.nataliya.controller.openapi.UserOpenApi;
-import com.nataliya.dto.user.UsernameResponseDto;
+import com.nataliya.dto.response.user.UsernameResponseDto;
 import com.nataliya.security.model.AuthenticatedUser;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
