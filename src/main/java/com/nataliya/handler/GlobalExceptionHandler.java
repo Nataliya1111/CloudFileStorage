@@ -151,7 +151,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(MultipartException.class)
-    public ResponseEntity<ErrorResponseDto> handleException(MultipartException ex) {
+    public ResponseEntity<ErrorResponseDto> handleException(MultipartException ex, HttpServletRequest request) {
 
         Throwable root = NestedExceptionUtils.getMostSpecificCause(ex);
 
@@ -165,7 +165,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                     .body(new ErrorResponseDto(message));
         }
 
-        throw ex;
+        return handleException((Exception) ex, request);
     }
 
     @Override

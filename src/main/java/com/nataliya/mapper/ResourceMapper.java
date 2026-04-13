@@ -7,23 +7,27 @@ import com.nataliya.util.PathUtil;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.Named;
 
 import java.util.List;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, imports = PathUtil.class)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ResourceMapper {
 
-    @Mapping(
-            target = "path",
-            expression = "java(PathUtil.extractParentDirectoryPath(resource.getPath()))"
-    )
-    @Mapping(target = "name", expression = "java(mapName(resource))")
+    @Mapping(target = "path", source = "resource", qualifiedByName = "toParentPath")
+    @Mapping(target = "name", source = "resource", qualifiedByName = "toDisplayName")
     @Mapping(source = "resourceType", target = "type")
     ResourceResponseDto resourceToResourceDto(Resource resource);
 
     List<ResourceResponseDto> resourceListToDtoList(List<Resource> resources);
 
-    default String mapName(Resource resource) {
+    @Named("toParentPath")
+    default String toParentPath(Resource resource) {
+        return PathUtil.extractParentDirectoryPath(resource.getPath());
+    }
+
+    @Named("toDisplayName")
+    default String toDisplayName(Resource resource) {
         if (resource.getResourceType() == ResourceType.DIRECTORY) {
             return resource.getResourceName() + "/";
         }

@@ -14,7 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-@Builder
+@Builder //need to remove (look review)
 public class Resource {
 
     @Id
