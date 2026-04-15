@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileUploadService {
 
     private final ResourceMetadataService resourceMetadataService;
-    private final MinioService minioService;
+    private final ObjectStorageService objectStorageService;
 
     @Value("${app.max-storage.user}")
     private DataSize maxUserStorage;
@@ -45,21 +45,21 @@ public class FileUploadService {
         checkServerStorageLimit(filesize);
 
         Resource fileMetadata = resourceMetadataService.createFileMetadata(userId, relativeDirectoryPath, filename, filesize);
-        minioService.uploadFile(fileMetadata.getId(), file);
+        objectStorageService.uploadFile(fileMetadata.getId(), file);
 
         return fileMetadata;
     }
 
-    private void checkUserStorageLimit(Long userId, long filesize){
+    private void checkUserStorageLimit(Long userId, long filesize) {
         long userStorageUsage = resourceMetadataService.getUserStorageUsage(userId);
-        if (userStorageUsage + filesize > maxUserStorageBytes){
+        if (userStorageUsage + filesize > maxUserStorageBytes) {
             throw new StorageLimitExceededException("User storage limit exceeded");
         }
     }
 
     private void checkServerStorageLimit(long filesize) {
         long totalStorageUsage = resourceMetadataService.getTotalStorageUsage();
-        if (totalStorageUsage + filesize > maxServerStorageBytes){
+        if (totalStorageUsage + filesize > maxServerStorageBytes) {
             throw new StorageLimitExceededException("Server storage full");
         }
     }

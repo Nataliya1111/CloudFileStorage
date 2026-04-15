@@ -24,7 +24,7 @@ public class FileSystemService {
     private final FileUploadService fileUploadService;
     private final DownloadService downloadService;
     private final ResourceMapper resourceMapper;
-    private final MinioService minioService;
+    private final ObjectStorageService objectStorageService;
 
     @Transactional(readOnly = true)
     public ResourceResponseDto getResourceInfo(Long userId, String resourcePath) {
@@ -101,7 +101,7 @@ public class FileSystemService {
                 .map(Resource::getId)
                 .toList();
 
-        minioService.deleteFiles(filesIds);
+        objectStorageService.deleteFiles(filesIds);
         resourceMetadataService.deleteResources(subtree);
     }
 
@@ -163,7 +163,13 @@ public class FileSystemService {
         Resource destinationParent = resourceMetadataService.getResource(userId, destinationParentPath);
 
         List<Resource> subtree = resourceMetadataService.getDirectorySubtree(userId, sourceFullPath);
+
+        //Invariant: processing from root to leaves — parent nodes must be moved before child
+        //nodes are processed. Violating this order results in the loss of parent references.
         subtree.sort(Comparator.comparingInt(r -> r.getPath().length()));
+
+        assert subtree.isEmpty() || subtree.getFirst().getPath().startsWith(sourceFullPath)
+                : "Subtree root must match sourceFullPath";
 
         int sourcePathLength = sourceFullPath.length();
 

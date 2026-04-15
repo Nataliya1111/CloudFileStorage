@@ -7,7 +7,6 @@ import com.nataliya.model.Role;
 import com.nataliya.model.entity.User;
 import com.nataliya.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,11 +32,7 @@ public class RegistrationService {
             resourceMetadataService.createRootDirectoryMetadata(savedUser.getId());
             return new UsernameResponseDto(savedUser.getUsername());
         } catch (DataIntegrityViolationException ex) {
-            if (ex.getCause() instanceof ConstraintViolationException) {
-                throw new UserAlreadyExistsException("User with such login already exists", ex);
-            } else {
-                throw ex;
-            }
+            throw new UserAlreadyExistsException("User with such login already exists", ex);
         }
     }
 }

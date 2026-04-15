@@ -24,36 +24,33 @@ import java.util.stream.Collectors;
 public class DownloadService {
 
     private final ResourceMetadataService resourceMetadataService;
-    private final MinioService minioService;
+    private final ObjectStorageService objectStorageService;
 
     public DownloadResourceDto prepareDownload(Long userId, String resourcePath) {
 
         String normalizedPath = PathUtil.normalizePath(resourcePath);
 
         Resource resource = resourceMetadataService.getResource(userId, normalizedPath);
-        String downloadedResourceName = resource.getResourceType() == ResourceType.FILE ?
+        boolean isFile = resource.getResourceType() == ResourceType.FILE;
+        UUID fileId = resource.getId();
+
+        String downloadedResourceName = isFile ?
                 resource.getResourceName() : (resource.getResourceName() + ".zip");
 
-        StreamingResponseBody body =
-                outputStream -> writeDataToStream(userId, normalizedPath, outputStream);
+        StreamingResponseBody body = outputStream -> {
+            if (isFile) {
+                writeFileToStream(normalizedPath, outputStream, fileId);
+            } else {
+                writeDirectoryContentsToStream(userId, normalizedPath, outputStream);
+            }
+        };
 
         return new DownloadResourceDto(downloadedResourceName, body);
     }
 
-    private void writeDataToStream(Long userId, String resourcePath, OutputStream outputStream) {
+    private void writeFileToStream(String resourcePath, OutputStream outputStream, UUID fileId) {
 
-        if (resourcePath.endsWith("/")) {
-            writeDirectoryContentsToStream(userId, resourcePath, outputStream);
-        } else {
-            writeFileToStream(userId, resourcePath, outputStream);
-        }
-    }
-
-    private void writeFileToStream(Long userId, String resourcePath, OutputStream outputStream) {
-
-        Resource file = resourceMetadataService.getResource(userId, resourcePath);
-        ensureIsFile(file);
-        try (InputStream inputStream = minioService.getFileStream(file.getId())) {
+        try (InputStream inputStream = objectStorageService.getFileStream(fileId)) {
             inputStream.transferTo(outputStream);
         } catch (IOException e) {
             throw new FileStreamingException("Failed to stream file: " + resourcePath, e);
@@ -79,7 +76,7 @@ public class DownloadService {
             for (Resource resource : leafs) {
                 String zipPath = PathUtil.extractZipPath(resource.getPath(), resourcePath);
                 if (resource.getResourceType() == ResourceType.FILE) {
-                    try (InputStream inputStream = minioService.getFileStream(resource.getId())) {
+                    try (InputStream inputStream = objectStorageService.getFileStream(resource.getId())) {
                         zipWriter.addFile(zipPath, inputStream);
                     }
                 } else {
@@ -91,11 +88,4 @@ public class DownloadService {
         }
     }
 
-    private void ensureIsFile(Resource resource) {
-        if (resource.getResourceType() != ResourceType.FILE) {
-            throw new IllegalStateException(
-                    "Expected FILE resource but got DIRECTORY for path: " + resource.getPath()
-            );
-        }
-    }
 }

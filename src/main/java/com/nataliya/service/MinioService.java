@@ -5,7 +5,6 @@ import com.nataliya.exception.MinioStorageException;
 import io.minio.*;
 import io.minio.messages.DeleteError;
 import io.minio.messages.DeleteObject;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,22 +14,17 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class MinioService {
+public class MinioService implements ObjectStorageService {
 
     private final MinioClient minioClient;
     private final MinioProperties properties;
-    private String bucketName;
 
-    @PostConstruct
-    public void init() {
-        this.bucketName = properties.getBucketName();
-    }
-
+    @Override
     public void uploadFile(UUID objectKey, MultipartFile file) {
 
         try {
             minioClient.putObject(PutObjectArgs.builder()
-                    .bucket(bucketName)
+                    .bucket(properties.getBucketName())
                     .object(objectKey.toString())
                     .stream(file.getInputStream(), file.getSize(), -1)
                     .contentType(file.getContentType())
@@ -40,10 +34,11 @@ public class MinioService {
         }
     }
 
+    @Override
     public InputStream getFileStream(UUID objectKey) {
         try {
             return minioClient.getObject(GetObjectArgs.builder()
-                    .bucket(bucketName)
+                    .bucket(properties.getBucketName())
                     .object(objectKey.toString())
                     .build());
         } catch (Exception e) {
@@ -51,9 +46,10 @@ public class MinioService {
         }
     }
 
+    @Override
     public void deleteFiles(List<UUID> objectKeys) {
 
-        if (objectKeys.isEmpty()){
+        if (objectKeys.isEmpty()) {
             return;
         }
 
@@ -66,7 +62,7 @@ public class MinioService {
         Iterable<Result<DeleteError>> results =
                 minioClient.removeObjects(
                         RemoveObjectsArgs.builder()
-                                .bucket(bucketName)
+                                .bucket(properties.getBucketName())
                                 .objects(objects)
                                 .build());
 
