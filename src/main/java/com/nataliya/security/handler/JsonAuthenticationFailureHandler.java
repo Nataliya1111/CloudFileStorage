@@ -2,9 +2,9 @@ package com.nataliya.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nataliya.dto.response.error.ErrorResponseDto;
+import com.nataliya.exception.AuthConstraintViolationException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,7 +30,7 @@ public class JsonAuthenticationFailureHandler implements AuthenticationFailureHa
 
         String errorMessage;
 
-        if (e instanceof BadCredentialsException && e.getCause() instanceof ConstraintViolationException) {
+        if (e instanceof AuthConstraintViolationException) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());  //400
             errorMessage = e.getMessage();
         } else if (e instanceof BadCredentialsException) {

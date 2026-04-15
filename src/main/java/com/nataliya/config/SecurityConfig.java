@@ -6,7 +6,7 @@ import com.nataliya.security.filter.JsonUsernamePasswordAuthenticationFilter;
 import com.nataliya.security.handler.HttpStatusLogoutSuccessHandler;
 import com.nataliya.security.handler.JsonAuthenticationFailureHandler;
 import com.nataliya.security.handler.JsonAuthenticationSuccessHandler;
-import com.nataliya.validation.UserDtoValidator;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -77,7 +77,7 @@ public class SecurityConfig {
     @Bean
     public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter(
             AuthenticationManager authenticationManager,
-            UserDtoValidator validator,
+            Validator validator,
             ObjectMapper objectMapper,
             JsonAuthenticationSuccessHandler successHandler,
             JsonAuthenticationFailureHandler failureHandler,
